@@ -1,3 +1,4 @@
+import { fs } from './index.js'
 
 export class Gvas {
     constructor()
@@ -19,5 +20,10 @@ export class Gvas {
         }
         this.SaveGameType = "";
         this.Properties = [];
+    }
+    static fromFile(path) {
+        let gvas = new Gvas();
+        Object.assign(gvas, fs.readFileSync(path, 'utf8'));
+        return gvas;
     }
 }
