@@ -10,7 +10,7 @@ export class FileIO {
         this._pos = 0;
     }
     get fd() { return this._fd; }
-    get peek() { return this._pos; }
+    get tell() { return this._pos; }
     seek(numBytes) {
         return (this._pos += numBytes);
     }
@@ -28,57 +28,57 @@ export class Reader extends FileIO {
     }
     readBytes(count) {
         let buf = Buffer.alloc(count);
-        this.seek(fs.readSync(this._fd, buf, 0, count, this._pos));
+        this.seek(fs.readSync(this._fd, buf, 0, count, this.tell));
         return buf;
     }
 
     readByte() {
-        this.seek(fs.readSync(this._fd, byte, 0, 1, this._pos));
+        this.seek(fs.readSync(this._fd, byte, 0, 1, this.tell));
         return byte.readUInt8();
     }
 
     readInt32() {
-        this.seek(fs.readSync(this._fd, dword, 0, 4, this._pos));
+        this.seek(fs.readSync(this._fd, dword, 0, 4, this.tell));
         return dword.readInt32LE();
     }
 
     readInt16() {
-        this.seek(fs.readSync(this._fd, word, 0, 2, this._pos));
+        this.seek(fs.readSync(this._fd, word, 0, 2, this.tell));
         return word.readUInt16LE();
     }
 
     readFloat() {
-        this.seek(fs.readSync(this._fd, dword, 0, 4, this._pos));
+        this.seek(fs.readSync(this._fd, dword, 0, 4, this.tell));
         return dword.readFloatLE();
     }
 
     readString() {
-        this.seek(fs.readSync(this._fd, dword, 0, 4, this._pos));
+        this.seek(fs.readSync(this._fd, dword, 0, 4, this.tell));
         let length = dword.readInt32LE();
         let buf = Buffer.alloc(length);
 
-        this.seek(fs.readSync(this._fd, buf, 0, length, this._pos));
+        this.seek(fs.readSync(this._fd, buf, 0, length, this.tell));
         return buf.toString('utf8');
     }
 
     readGuid() {
-        this.seek(fs.readSync(this._fd, dword, 0, 4, this._pos));
+        this.seek(fs.readSync(this._fd, dword, 0, 4, this.tell));
         dword.swap32();
         let guid = `${dword.toString('hex')}`;
 
-        this.seek(fs.readSync(this._fd, word, 0, 2, this._pos));
+        this.seek(fs.readSync(this._fd, word, 0, 2, this.tell));
         word.swap16();
         guid += `-${word.toString('hex')}`;
 
-        this.seek(fs.readSync(this._fd, word, 0, 2, this._pos));
+        this.seek(fs.readSync(this._fd, word, 0, 2, this.tell));
         word.swap16();
         guid += `-${word.toString('hex')}`;
 
-        this.seek(fs.readSync(this._fd, word, 0, 2, this._pos));
+        this.seek(fs.readSync(this._fd, word, 0, 2, this.tell));
         guid += `-${word.toString('hex')}`;
 
         let buf = Buffer.alloc(6);
-        this.seek(fs.readSync(this._fd, buf, 0, 6,this. _pos));
+        this.seek(fs.readSync(this._fd, buf, 0, 6,this.tell));
         guid += `-${buf.toString('hex')}`;
 
         return guid;
@@ -140,14 +140,14 @@ export class Reader extends FileIO {
 
                 let itemType = this.readString();
                 length = this.readInt32();
-                let start = this.peek;
+                let start = this.tell;
                 this.seek(4);
 
                 let itemName = this.readString();
                 this.seek(17);
 
                 let array = [];
-                while(this.peek < (start + length)) {
+                while(this.tell < (start + length)) {
                     let props = this.readProperties();
                     if(props) {
                         array.push(props);
@@ -178,7 +178,10 @@ export class Writer extends FileIO {
     constructor() {
         super();
     }
-    writeBytes(buffer) {
-        
+    writeBytes(buf) {
+        this.seek(fs.writeSync(this.fd, buf, 0, buf.length, this.tell));
+    }
+    writeByte(buf) {
+        this.seek(fs.writeSync(this._fd, buf, 0, 1, this.tell));
     }
 }
