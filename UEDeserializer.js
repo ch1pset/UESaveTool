@@ -25,17 +25,18 @@ function UEDeserializer()
                 .push({ Id:io.readGuid(), Value:io.readInt32() });
         }
         gvas.SaveGameType = io.readString();
-        // console.log(`Current Offset: ${io.pos}`);
         gvas.Properties = io.readProperties();
+        // console.log(`Current Offset: ${io.peek}`);
 
-        fs.createWriteStream('./output.json', 'utf8').write(JSON.stringify(gvas, null, 4), (err) => {
-            if(err) throw err;
-        });
+        fs.createWriteStream('./output.json', 'utf8')
+            .write(JSON.stringify(gvas, null, 4), (err) => {
+                if(err) throw err;
+            });
     } catch(e) {
         console.log(e);
     } finally {
         io.close();
-        console.log('Closed file');
+        console.log('Done.');
     }
 }
 
