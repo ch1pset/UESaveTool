@@ -1,8 +1,8 @@
 import { fs, Buffer } from './index.js'
 
-const dword = Buffer.alloc(4);
-const word = Buffer.alloc(2);
-const byte = Buffer.alloc(1);
+export const dword = Buffer.alloc(4);
+export const word = Buffer.alloc(2);
+export const byte = Buffer.alloc(1);
 
 export class FileIO {
     constructor() {

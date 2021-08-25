@@ -1,4 +1,4 @@
-import * as FileIO from './FileIO.js'
+import { FileIO, dword, word, byte } from './index.js'
 
 export class Reader extends FileIO {
     constructor() {

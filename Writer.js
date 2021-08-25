@@ -1,4 +1,4 @@
-import * as FileIO from './FileIO.js'
+import { FileIO, dword, word } from './index.js'
 
 export class Writer extends FileIO {
     //TODO: Write Serialized data to .sav file
