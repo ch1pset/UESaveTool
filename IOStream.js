@@ -14,7 +14,7 @@ export class Reader {
         return this._fd;
     }
 
-    get pos() {
+    get peek() {
         return this._pos;
     }
 
@@ -145,14 +145,14 @@ export class Reader {
 
                 let itemType = this.readString();
                 length = this.readInt32();
-                let start = this.pos;
+                let start = this.peek;
                 this.seek(4);
 
                 let itemName = this.readString();
                 this.seek(17);
 
                 let array = [];
-                while(this.pos < (start + length)) {
+                while(this.peek < (start + length)) {
                     let props = this.readProperties();
                     if(props) {
                         array.push(props);
