@@ -25,7 +25,7 @@ function UEDeserializer()
                 .push({ Id:io.readGuid(), Value:io.readInt32() });
         }
         gvas.SaveGameType = io.readString();
-        console.log(`Current Offset: ${io.pos}`);
+        // console.log(`Current Offset: ${io.pos}`);
         gvas.Properties = io.readProperties();
 
         fs.createWriteStream('./output.json', 'utf8').write(JSON.stringify(gvas, null, 4), (err) => {
