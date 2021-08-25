@@ -93,16 +93,19 @@ export class Reader {
             let next = this.readString();
             if(next === 'None\0')
                 break;
-            data[next] = this.readProperty(next);
-            console.log(`Prop: ${JSON.stringify(data[next])}`);
+            if(next !== '')
+            {
+                data[next] = this.readProperty(next);
+                // console.log(`Prop: ${JSON.stringify(data[next])}`);
+            }
         }
         return data;
     }
 
     readProperty(name) {
-        console.log(`Checking Property: ${name}`);
+        // console.log(`Checking Property: ${name}`);
         let type = this.readString();
-        console.log(`Checking Type: ${type}`);
+        // console.log(`Checking Type: ${type}`);
         let value, length;
         switch(type)
         {
@@ -124,42 +127,46 @@ export class Reader {
             case 'SoftObjectProperty\0':
                 length = this.readInt32();
                 this.seek(5);
-                value = this.readBytes(length).toString('utf8');
+                value = this.readString();
                 break;
             case 'StructProperty\0':
                 length = this.readInt32();
                 this.seek(4);
                 let sType = this.readString();
                 this.seek(17);
-                value = {'type':sType, 'properties':this.readProperties()}
+                value = {'type':sType, 'properties':this.readProperties()};
                 break;
             case 'ArrayProperty\0':
+                // console.log(`Current Offset: ${this.pos}`);
                 length = this.readInt32();
                 this.seek(4);
-                this.readString();
+            
+                let structType = this.readString();
                 this.readInt32();
                 this.seek(1);
 
-                this.readString();
-                this.readString();
+                let arrayName = this.readString();
+
+                let itemType = this.readString();
                 length = this.readInt32();
+                let start = this.pos;
                 this.seek(4);
 
-                let aType = this.readString();
+                let itemName = this.readString();
                 this.seek(17);
 
                 let array = [];
-                while(this.pos < length) {
-                    console.log(`Array Loop`);
+                while(this.pos < (start + length)) {
                     let props = this.readProperties();
                     if(props) {
                         array.push(props);
                     }
-                    else {
-                        break;
-                    }
                 }
-                value = {'type':aType, 'data': array}
+                value = {
+                    'type':structType,
+                    'name':arrayName,
+                    'array':{'type':itemType, 'name':itemName, 'data': array}
+                }
                 break;
             case 'EnumProperty\0':
                 length = this.readInt32();
