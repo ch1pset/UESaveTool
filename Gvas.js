@@ -18,6 +18,6 @@ export class Gvas {
             Entries:[]
         }
         this.SaveGameType = "";
-        this.Properties = {};
+        this.Properties = [];
     }
 }

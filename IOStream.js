@@ -88,20 +88,18 @@ export class Reader {
 
     readProperties()
     {
-        let data = {};
+        let data = [];
         let next;
         while((next = this.readString()) !== 'None\0') {
             if(next !== '') {
-                data[next] = this.readProperty(next);
+                data.push(this.readProperty(next));
             }
         }
         return data;
     }
 
     readProperty(name) {
-        // console.log(`Checking Property: ${name}`);
         let type = this.readString();
-        // console.log(`Checking Type: ${type}`);
         let value, length;
         switch(type)
         {
@@ -133,7 +131,6 @@ export class Reader {
                 value = {'type':sType, 'properties':this.readProperties()};
                 break;
             case 'ArrayProperty\0':
-                // console.log(`Current Offset: ${this.pos}`);
                 length = this.readInt32();
                 this.seek(4);
             
