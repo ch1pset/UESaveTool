@@ -89,14 +89,10 @@ export class Reader {
     readProperties()
     {
         let data = {};
-        while(true) {
-            let next = this.readString();
-            if(next === 'None\0')
-                break;
-            if(next !== '')
-            {
+        let next;
+        while((next = this.readString()) !== 'None\0') {
+            if(next !== '') {
                 data[next] = this.readProperty(next);
-                // console.log(`Prop: ${JSON.stringify(data[next])}`);
             }
         }
         return data;
@@ -173,7 +169,7 @@ export class Reader {
                 this.seek(4);
                 let eType = this.readString();
                 this.seek(1);
-                value = {'type':eType, 'value':this.readBytes(length).toString('utf8')};
+                value = {'type':eType, 'value':this.readString()};
                 break;
             default:
                 throw new Error(`Unrecognized Property: ${type}`);
