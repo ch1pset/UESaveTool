@@ -15,7 +15,9 @@ export class FileIO {
         return (this._pos += numBytes);
     }
     open(path) {
-        this._fd = fs.openSync(path);
+        if(!fs.existsSync(path))
+            fs.writeFileSync(path, '');    
+        this._fd = fs.openSync(path, 'r+');
     }
     close() {
         fs.closeSync(this._fd);
@@ -182,6 +184,20 @@ export class Writer extends FileIO {
         this.seek(fs.writeSync(this.fd, buf, 0, buf.length, this.tell));
     }
     writeByte(buf) {
-        this.seek(fs.writeSync(this._fd, buf, 0, 1, this.tell));
+        this.seek(fs.writeSync(this.fd, buf, 0, 1, this.tell));
+    }
+    writeInt32(num) {
+        dword.writeInt32LE(num);
+        this.seek(fs.writeSync(this.fd, dword, 0, 4, this.tell));
+    }
+    writeInt16(num) {
+        word.writeInt16LE(num);
+        this.seek(fs.writeSync(this.fd, word, 0, 2, this.tell));
+    }
+    writeString(str) {
+        let buf = Buffer.from(str);
+        dword.writeInt32LE(str.length);
+        this.seek(fs.writeSync(this.fd, dword, 0, 4, this.tell));
+        this.seek(fs.writeSync(this.fd, buf, 0, str.length, this.tell));
     }
 }
