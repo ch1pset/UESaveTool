@@ -23,7 +23,7 @@ export class Gvas {
     }
     static fromFile(path) {
         let gvas = new Gvas();
-        Object.assign(gvas, fs.readFileSync(path, 'utf8'));
+        Object.assign(gvas, JSON.parse(fs.readFileSync(path, 'utf8')));
         return gvas;
     }
 }
