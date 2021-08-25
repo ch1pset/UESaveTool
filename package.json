@@ -1,6 +1,3 @@
 {
-    "type": "module",
-    "dependencies": {
-        "uuid": "^8.3.2"
-    }
+    "type": "module"
 }
