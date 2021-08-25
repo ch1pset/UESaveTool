@@ -4,29 +4,27 @@ const dword = Buffer.alloc(4);
 const word = Buffer.alloc(2);
 const byte = Buffer.alloc(1);
 
-export class Reader {
+export class FileIO {
     constructor() {
         this._fd = 0;
         this._pos = 0;
     }
-
-    get fd() {
-        return this._fd;
-    }
-
-    get peek() {
-        return this._pos;
-    }
-
+    get fd() { return this._fd; }
+    get peek() { return this._pos; }
     seek(numBytes) {
         return (this._pos += numBytes);
     }
-
     open(path) {
         this._fd = fs.openSync(path);
     }
     close() {
         fs.closeSync(this._fd);
+    }
+}
+
+export class Reader extends FileIO {
+    constructor() {
+        super();
     }
     readBytes(count) {
         let buf = Buffer.alloc(count);
@@ -175,6 +173,12 @@ export class Reader {
     }
 }
 
-export class Writer {
+export class Writer extends FileIO {
     //TODO: Write Serialized data to .sav file
+    constructor() {
+        super();
+    }
+    writeBytes(buffer) {
+        
+    }
 }
