@@ -201,6 +201,23 @@ export class Writer extends FileIO {
         this.write(buf);
     }
     writeGuid(guid) {
+        let data = guid.split('-');
+        let buf1 = Buffer.from(data[0], 'hex');
+        buf1.swap32();
+        this.write(buf1);
 
+        let buf2 = Buffer.from(data[1], 'hex');
+        buf2.swap16();
+        this.write(buf2);
+
+        buf2 = Buffer.from(data[2], 'hex');
+        buf2.swap16();
+        this.write(buf2);
+
+        buf2 = Buffer.from(data[3], 'hex');
+        this.write(buf2);
+
+        let buf3 = Buffer.from(data[4], 'hex');
+        this.write(buf3);
     }
 }
