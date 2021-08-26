@@ -48,12 +48,22 @@ export class Writer extends FileIO {
             // console.log(JSON.stringify(props[i]));
             if(props[i]['name'] !== null)
                 this.writeProperty(props[i]);
-            else if(props[i]['name'] !== undefined)
-                this.writeString('');
             else
-                this.writeProperty(props[i])
+                this.writeString('');
         }
         this.writeString('None\0');
+    }
+    writeArrayItems(arr) {
+        for(let i = 0; i < arr.length; i++) {
+            for(let j = 0; j < arr[i]['value'].length; j++) {
+                let item = arr[i]['value'][j];
+                if(item['name'] !== null)
+                    this.writeProperty(item);
+                else
+                    this.write(Buffer.alloc(4));
+            }
+            this.writeString('None\0');
+        }
     }
     writeProperty(prop) {
         this.writeString(prop['name']);
@@ -80,11 +90,14 @@ export class Writer extends FileIO {
 
             case 'StrProperty\0':
             case 'ObjectProperty\0':
-            case 'SoftObjectProperty\0':
                 this.writeInt32(prop['value'].length + 4);
                 this.write(Buffer.alloc(5));
                 this.writeString(prop['value']);
-                this.write(Buffer.alloc(4));
+                break;
+            case 'SoftObjectProperty\0':
+                this.writeInt32(prop['value'].length + 8);
+                this.write(Buffer.alloc(5));
+                this.writeString(prop['value']);
                 break;
 
             case 'StructProperty\0':
@@ -108,14 +121,7 @@ export class Writer extends FileIO {
                 this.writeString(prop['value']['array']['name']);
                 this.write(Buffer.alloc(17));
                 // console.log(JSON.stringify(prop['value']['array']));
-                let arr = prop['value']['array']['data'];
-                for(let i = 0; i < arr.length; i++) {
-                    for(let j = 0; j < arr[i]['value'].length; j++) {
-                        if(arr[i]['value'][j]['name'] !== null)
-                            this.writeProperty(arr[i]['value'][j]);
-                    }
-                    this.writeString('None\0');
-                }
+                this.writeArrayItems(prop['value']['array']['data']);
                 break;
 
             case 'EnumProperty\0':
