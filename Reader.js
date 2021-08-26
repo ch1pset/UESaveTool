@@ -70,7 +70,7 @@ export class Reader extends FileIO {
             if(next !== '') {
                 data.push(this.readProperty(next));
             } else {
-                data.push({'name':null, 'type':null, 'value':null})
+                data.push({'name':null})
                 // console.log(`Empty String at offset: ${this.tell}`);
             }
         }
@@ -116,7 +116,7 @@ export class Reader extends FileIO {
                 this.seek(4);
             
                 let structType = this.readString();
-                console.log(`Unkown size value: ${this.readInt32()}`);
+                let someValue = this.readInt32();
                 this.seek(1);
 
                 let arrayName = this.readString();
@@ -141,6 +141,7 @@ export class Reader extends FileIO {
                 value = {
                     'size':structSize,
                     'type':structType,
+                    'unkown':someValue,
                     'name':arrayName,
                     'array':{'size':length,'type':itemType, 'name':itemName, 'data': array}
                 }
