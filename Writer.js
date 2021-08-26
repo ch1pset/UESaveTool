@@ -128,9 +128,9 @@ export class Writer extends FileIO {
                 console.log(`Enum Prop: ${JSON.stringify(prop)}`);
                 this.writeInt32(4);
                 this.write(Buffer.alloc(4));
-                this.writeString(prop['name']);
+                this.writeString(prop['value']['type']);
                 this.write(Buffer.alloc(1));
-                this.writeString(prop['value'])
+                this.writeString(prop['value']['value']);
                 break;
                 
             default:
