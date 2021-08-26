@@ -149,9 +149,9 @@ export class Reader extends FileIO {
             case 'EnumProperty\0':
                 length = this.readInt32();
                 this.seek(4);
-                let eType = this.readString();
+                this.readString(); //same as type
                 this.seek(1);
-                value = {'size':length,'type':eType, 'value':this.readString()};
+                value = this.readString();
                 break;
             default:
                 throw new Error(`Unrecognized Property: ${type}`);
