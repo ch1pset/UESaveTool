@@ -48,8 +48,10 @@ export class Writer extends FileIO {
             // console.log(JSON.stringify(props[i]));
             if(props[i]['name'] !== null)
                 this.writeProperty(props[i]);
-            else
+            else if(props[i]['name'] !== undefined)
                 this.writeString('');
+            else
+                this.writeProperty(props[i])
         }
         this.writeString('None\0');
     }
@@ -63,23 +65,28 @@ export class Writer extends FileIO {
                 this.write(Buffer.from(prop['value'] ? 1 : 0, 0, 1));
                 this.write(Buffer.alloc(1));
                 break;
+
             case 'IntProperty\0':
                 this.writeInt32(4);
                 this.write(Buffer.alloc(5));
                 this.writeInt32(prop['value']);
                 break;
+
             case 'FloatProperty\0':
                 this.writeInt32(4);
                 this.write(Buffer.alloc(5));
                 this.writeFloat(prop['value']);
                 break;
+
             case 'StrProperty\0':
             case 'ObjectProperty\0':
             case 'SoftObjectProperty\0':
-                this.writeInt32(prop['value'].length);
+                this.writeInt32(prop['value'].length + 4);
                 this.write(Buffer.alloc(5));
                 this.writeString(prop['value']);
+                this.write(Buffer.alloc(4));
                 break;
+
             case 'StructProperty\0':
                 this.writeInt32(prop['value']['size']);
                 this.write(Buffer.alloc(4));
@@ -87,6 +94,7 @@ export class Writer extends FileIO {
                 this.write(Buffer.alloc(17));
                 this.writeProperties(prop['value']['properties']);
                 break;
+
             case 'ArrayProperty\0':
                 this.writeInt32(prop['value']['size']);
                 this.write(Buffer.alloc(4));
@@ -99,15 +107,24 @@ export class Writer extends FileIO {
                 this.write(Buffer.alloc(4));
                 this.writeString(prop['value']['array']['name']);
                 this.write(Buffer.alloc(17));
-                console.log(JSON.stringify(prop['value']['array']));
-                this.writeProperties(prop['value']['array']['data']);
+                // console.log(JSON.stringify(prop['value']['array']));
+                let arr = prop['value']['array']['data'];
+                for(let i = 0; i < arr.length; i++) {
+                    for(let j = 0; j < arr[i]['value'].length; j++) {
+                        if(arr[i]['value'][j]['name'] !== null)
+                            this.writeProperty(arr[i]['value'][j]);
+                    }
+                    this.writeString('None\0');
+                }
                 break;
+
             case 'EnumProperty\0':
                 this.writeInt32(4);
                 this.write(Buffer.alloc(4));
                 this.writeString(prop['value']['type']);
                 this.write(Buffer.alloc(1));
                 break;
+                
             default:
                 throw new Error(`Unrecognized Property: ${prop['type']}`);
         }
