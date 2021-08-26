@@ -130,11 +130,11 @@ export class Reader extends FileIO {
                 let itemName = this.readString();
                 this.seek(17);
 
-                let array = [];
+                let array = {'size':length, 'type':itemType, 'name':itemName, 'data':[]};
                 while(this.tell < (start + length)) {
                     let props = this.readProperties();
                     if(props) {
-                        array.push(props);
+                        array.data.push({'value':props});
                     }
                 }
                 console.log(`Array read has ${array.length} items`);
@@ -143,7 +143,7 @@ export class Reader extends FileIO {
                     'type':structType,
                     'unkown':someValue,
                     'name':arrayName,
-                    'array':{'size':length,'type':itemType, 'name':itemName, 'data': array}
+                    'array':array
                 }
                 break;
             case 'EnumProperty\0':
