@@ -1,4 +1,4 @@
-import { fs } from './index.js'
+import * as fs from 'fs'
 
 export class Gvas {
     constructor()
@@ -25,5 +25,18 @@ export class Gvas {
         let gvas = new Gvas();
         Object.assign(gvas, JSON.parse(fs.readFileSync(path, 'utf8')));
         return gvas;
+    }
+}
+
+export class Property {
+    constructor() {
+        this.Name = '';
+        this.Type = '';
+        this.Value = '';
+    }
+    static from(json) {
+        let prop = new Property();
+        Object.assign(prop, json);
+        return prop;
     }
 }

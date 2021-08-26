@@ -1,4 +1,5 @@
-import { fs, Buffer } from './index.js'
+import * as fs from 'fs';
+import { Buffer } from 'buffer';
 
 export const dword = Buffer.alloc(4);
 export const word = Buffer.alloc(2);

@@ -1,9 +1,9 @@
-import { fs, Buffer, argv, Writer } from './index.js'
-import { Gvas } from './Gvas.js'
+import { Buffer } from 'buffer';
+import { Writer, Gvas } from './index.js';
 
 function UESerializer() 
 {
-    const gvas = Gvas.fromFile(argv[2]);
+    const gvas = Gvas.fromFile(process.argv[2]);
     // console.log(JSON.stringify(gvas));
     const io = new Writer();
     try {

@@ -137,7 +137,7 @@ export class Reader extends FileIO {
                         array.data.push({'value':props});
                     }
                 }
-                console.log(`Array read has ${array.length} items`);
+                console.log(`Array read has ${array.data.length} items`);
                 value = {
                     'size':structSize,
                     'type':structType,

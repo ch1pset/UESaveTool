@@ -1,4 +1,5 @@
-import { FileIO, dword, word } from './index.js'
+import { Buffer } from 'buffer';
+import { FileIO, dword, word } from './index.js';
 
 export class Writer extends FileIO {
     //TODO: Write Serialized data to .sav file
@@ -45,7 +46,6 @@ export class Writer extends FileIO {
     }
     writeProperties(props) {
         for(let i = 0; i < props.length; i++) {
-            // console.log(JSON.stringify(props[i]));
             if(props[i]['name'] !== null)
                 this.writeProperty(props[i]);
             else

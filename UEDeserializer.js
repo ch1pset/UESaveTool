@@ -1,12 +1,13 @@
-import { fs, Buffer, argv, Reader } from './index.js'
-import { Gvas } from './Gvas.js'
+import * as fs from 'fs';
+import { Buffer } from 'buffer';
+import { Reader, Gvas } from './index.js'
 
 function UEDeserializer()
 {
     const gvas = new Gvas();
     const io = new Reader();
     try {
-        io.open(argv[2]);
+        io.open(process.argv[2]);
         const header = io.readBytes(4);
         if(Buffer.compare(Buffer.from(gvas.Header), header) !== 0)
             throw Error(`Unexpected header, expected ${gvas.Header}`)
