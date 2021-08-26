@@ -24,6 +24,7 @@ function UESerializer()
         }
         io.writeString(gvas.SaveGameType);
         //TODO Write Properties
+        io.writeProperties(gvas.Properties);
     }
     catch(e) {
         console.log(e);
