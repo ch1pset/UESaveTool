@@ -4,6 +4,7 @@ export class Property {
         this.Name = name;
         this.Type = type;
         this.Value = value;
+        this.Size = 0;
     }
     serialize() {
         throw new Error(`Serialization not implemented for property: ${JSON.stringify(this)}`);

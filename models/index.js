@@ -6,3 +6,6 @@ export { FloatProperty } from './FloatProperty.js'
 export { StrProperty } from './StrProperty.js'
 export { ObjectProperty } from './ObjectProperty.js'
 export { SoftObjectProperty } from './SoftObjectProperty.js'
+export { StructProperty } from './StructProperty.js';
+export { ArrayProperty } from './ArrayProperty.js';
+export { EnumProperty } from './EnumProperty.js';
