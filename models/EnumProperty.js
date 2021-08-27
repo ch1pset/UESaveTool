@@ -6,7 +6,7 @@ export class EnumProperty extends Property {
         this.EnumType = etype;
     }
     get Size() {
-        return this.Value.length + 4;
+        return this.Value.length + this.Type.length + this.Name.length + this.EnumType.length + 25;
     }
     static from(obj) {
         let prop = new EnumProperty();

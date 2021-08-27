@@ -5,7 +5,7 @@ export class BoolProperty extends Property {
         super(name, type, value);
     }
     get Size() {
-        return 1;
+        return this.Name.length + this.Type.length + 9;
     }
     static from(obj) {
         let prop = new BoolProperty();

@@ -5,7 +5,7 @@ export class StrProperty extends Property {
         super(name, type, value);
     }
     get Size() {
-        return this.Value.length + 4;
+        return this.Value.length + this.Name.length + this.Type.length + 21;
     }
     static from(obj) {
         let prop = new StrProperty();

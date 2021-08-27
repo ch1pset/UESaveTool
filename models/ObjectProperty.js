@@ -5,7 +5,7 @@ export class ObjectProperty extends Property {
         super(name, type, value);
     }
     get Size() {
-        return this.Value.length + 4;
+        return this.Value.length + this.Type.length + this.Name.length + 21;
     }
     static from(obj) {
         let prop = new ObjectProperty();

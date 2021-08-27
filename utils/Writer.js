@@ -95,7 +95,8 @@ export class Writer extends FileIO {
                 break;
 
             case 'StructProperty\0':
-                this.writeInt32(prop.StoredSize);
+                // console.log(`StoredSize: ${prop.StoredSize}  Calc Size: ${prop.Size}`);
+                this.writeInt32(prop.Size);
                 this.write(Buffer.alloc(4));
                 this.writeString(prop.StoredPropertyType);
                 this.write(Buffer.alloc(17));
@@ -104,15 +105,18 @@ export class Writer extends FileIO {
 
             case 'ArrayProperty\0':
                 let start = this.tell;
-                this.writeInt32(prop.StoredSize);
+                // console.log(`\tStoredSize: ${prop.StoredSize}  Calc Size: ${prop.Size}`);
+                this.writeInt32(prop.Size);
                 this.write(Buffer.alloc(4));
                 this.writeString(prop.ArrayType);
                 this.write(Buffer.alloc(1));
+                let start2 = this.tell;
                 this.writeInt16(prop.Value.length);
                 this.write(Buffer.alloc(2));
                 this.writeString(prop.ArrayName);
                 this.writeString(prop.ArrayPropertyType);
-                this.writeInt32(prop.StoredSize - (this.tell - start) - 22);
+                let diff = this.tell - start2;
+                this.writeInt32(prop.Size - (diff + 8 + prop.ArrayPropertyName.length + 4 + 17));
                 this.write(Buffer.alloc(4));
                 this.writeString(prop.ArrayPropertyName);
                 this.write(Buffer.alloc(17));

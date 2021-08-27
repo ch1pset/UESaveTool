@@ -19,18 +19,18 @@ export class StructProperty extends Property {
         // console.log(`Generated Struct Length: ${this.Size}`)
     }
     get Size() {
-        // let props = this.Value.Properties.reduce((acc, curr) => acc ? acc.Size + curr.Size : 4)
         let size = 0;
-        size += this.StoredPropertyType.length + 4;
-        size += this.Type.length + 4;
+        size += 9;
         for(let i = 0; i < this.Properties.length; i++) {
-            if(this.Properties[i] !== null) {
+            if(this.Properties[i].Type === 'ArrayProperty\0') {
                 size += this.Properties[i].Name.length + 4;
                 size += this.Properties[i].Type.length + 4;
-                size += this.Properties[i].Size;
+                size += this.Properties[i].ArrayType.length + 4;
+                size += 9
             }
+            size += this.Properties[i].Size;
         }
-        return size + 14;
+        return size;
     }
     static from(obj) {
         let struct = new StructProperty();

@@ -5,7 +5,7 @@ export class SoftObjectProperty extends Property {
         super(name, type, value);
     }
     get Size() {
-        return this.Value.length + 8;
+        return this.Value.length + this.Type.length + this.Name.length + 25;
     }
     static from(obj) {
         let prop = new SoftObjectProperty();

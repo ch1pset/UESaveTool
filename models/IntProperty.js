@@ -5,7 +5,7 @@ export class IntProperty extends Property {
         super(name, type, value);
     }
     get Size() {
-        return 4;
+        return this.Name.length + this.Type.length + 21;
     }
     static from(obj) {
         let prop = new IntProperty();

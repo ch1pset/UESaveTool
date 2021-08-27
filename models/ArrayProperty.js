@@ -23,12 +23,6 @@ export class ArrayProperty extends Property {
     }
     get Size() {
         let size = 0;
-        size += this.Name.length + 4;
-        size += this.Type.length + 4;
-        size += 4;
-        size += 4;
-        size += this.ArrayType.length + 4;
-        size += 1;
         size += 4;
         size += this.ArrayName.length + 4;
         size += this.ArrayPropertyType.length + 4;
@@ -36,15 +30,11 @@ export class ArrayProperty extends Property {
         size += 4;
         size += this.ArrayPropertyName.length + 4;
         size += 17;
-        for(let i = 0; i < this.Array.length; i++) {
-            for(let j = 0; j < this.Array[i].length; j++) {
-                if(this.Array[i][j] !== null) {
-                    size += this.Array[i][j].Name.length + 4;
-                    size += this.Array[i][j].Type.length + 4;
-                    size += this.Array[i][j].Size;
-                }
+        for(let i = 0; i < this.Value.length; i++) {
+            for(let j = 0; j < this.Value[i].length; j++) {
+                size += this.Value[i][j].Size;
             }
-            size += 'None\0'.length + 4;
+            size += 9;
         }
         return size;
     }

@@ -137,6 +137,7 @@ export class Reader extends FileIO {
             
                 let atype = this.readString();
                 this.seek(1);
+                let start2 = this.tell;
                 let alength = this.readInt16();
                 this.seek(2);
 
@@ -145,9 +146,11 @@ export class Reader extends FileIO {
                 let ptype = this.readString();
                 let toEnd = this.readInt32(); //length - (current offset - start offset)
                 this.seek(4);
-
+                
                 let pname = this.readString();
                 this.seek(17);
+                
+                // console.log(`Total Length: ${length}  To End: ${toEnd}  Calculated: ${length - (this.tell - start2)}`)
 
                 value = [];
                 while(this.tell < (start + length)) {
