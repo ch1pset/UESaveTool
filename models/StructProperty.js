@@ -66,6 +66,8 @@ export class StructProperty extends Property {
                 case 'EnumProperty\0':
                     struct.Properties.push(EnumProperty.from(prop));
                     break;
+                default:
+                    throw new Error(`Unrecognized Property: ${prop.Type}`);
             }
         })
         return struct;

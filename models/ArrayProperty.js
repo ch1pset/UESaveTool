@@ -74,6 +74,8 @@ export class ArrayProperty extends Property {
                     case 'EnumProperty\0':
                         pair.push(EnumProperty.from(prop));
                         break;
+                    default:
+                        throw new Error(`Unrecognized Property: ${prop.Type}`);
                 }
             })
             array.Value.push(pair);

@@ -73,6 +73,8 @@ export class Gvas {
                 case 'EnumProperty\0':
                     gvas.Properties.push(EnumProperty.from(prop));
                     break;
+                default:
+                    throw new Error(`Unrecognized Property: ${prop.Type}`);
             }
         })
         return gvas;

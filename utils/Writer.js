@@ -134,7 +134,7 @@ export class Writer extends FileIO {
                 break;
                 
             default:
-                throw new Error(`Unrecognized Property: ${prop['type']}`);
+                throw new Error(`Unrecognized Property: ${prop.Type}`);
         }
     }
 }
