@@ -3,7 +3,8 @@
 A Node.js implementation for deserializing and converting GVAS/.sav files to JSON and vice-versa.
 
 ## Usage
-You must have [Node.js](www.nodejs.org) Version 16.7.0+ installed
+You must have [Node.js](www.nodejs.org) Version 16.7.0+ installed.  
+Download this entire repo by clicking on the `Code` button above.
 
 
 #### Deserialization into JSON
