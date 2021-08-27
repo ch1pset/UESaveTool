@@ -125,20 +125,22 @@ export class Reader extends FileIO {
                 return new SoftObjectProperty({name, type, value});
             case 'StructProperty\0':
                 length = this.readInt32();
+                console.log(`Sav Struct length: ${length}`);
                 this.seek(4);
-                let sType = this.readString();
+                let stype = this.readString();
                 this.seek(17);
-                value = {'Type':sType, 'Properties':this.readProperties()};
-                return new StructProperty({name, type, value})
+                let props = this.readProperties();
+                return new StructProperty({name, type, value}, {stype, props})
             case 'ArrayProperty\0':
                 let start = this.tell;
                 length = this.readInt32(); // stored struct size in bytes
+                console.log(`Sav Array Size: ${length}`);
                 this.seek(4);
             
                 let atype = this.readString();
                 this.seek(1);
                 let alength = this.readInt16();
-                console.log(`Items in Array: ${alength}`);
+                // console.log(`Items in Array: ${alength}`);
                 this.seek(2);
 
                 let aname = this.readString();
@@ -161,8 +163,8 @@ export class Reader extends FileIO {
                 this.seek(4);
                 let etype = this.readString(); //same as type
                 this.seek(1);
-                value = {'Type':etype, 'Value':this.readString()};
-                return new EnumProperty({name, type, value});
+                value = this.readString();
+                return new EnumProperty({name, type, value}, etype);
             default:
                 throw new Error(`Unrecognized Property: ${type}`);
         }

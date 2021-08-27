@@ -4,7 +4,9 @@ export class Property {
         this.Name = name;
         this.Type = type;
         this.Value = value;
-        this.Size = 0;
+    }
+    get Size() {
+        throw new Error(`Must implement getter for Size`);
     }
     serialize() {
         throw new Error(`Serialization not implemented for property: ${JSON.stringify(this)}`);
