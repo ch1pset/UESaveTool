@@ -37,6 +37,7 @@ export class StructProperty extends Property {
         struct.Name = obj.Name;
         struct.Type = obj.Type;
         struct.StoredPropertyType = obj.StoredPropertyType;
+        struct.StoredSize = obj.StoredSize;
         struct.Properties = [];
         obj.Properties.forEach((prop) => {
             switch(prop.Type)

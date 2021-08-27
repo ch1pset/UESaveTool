@@ -97,8 +97,13 @@ export class Reader extends FileIO {
                 this.seek(1);
                 return new BoolProperty(name, type, value);
             case 'IntProperty\0':
-                this.seek(9);
-                value = this.readInt32();
+                length = this.readInt32();
+                let int1 = this.readInt32(); // floor
+                // console.log(`Length: ${length}`);
+                this.seek(1);
+                // this.seek(9);
+                let int2 = this.readInt32();
+                value = [int1, int2]
                 return new IntProperty(name, type, value);
             case 'FloatProperty\0':
                 this.seek(9);
@@ -143,9 +148,11 @@ export class Reader extends FileIO {
                 let aname = this.readString();
 
                 let ptype = this.readString();
-                this.readInt32(); //length - (current offset - start offset)
+                let toEnd = this.readInt32(); //length - (current offset - start offset)
                 this.seek(4);
-
+                
+                console.log(`Lenght 1: ${length} FromHere: ${length - (this.tell - start) - 14}`)
+                console.log(`To End: ${toEnd}`)
                 let pname = this.readString();
                 this.seek(17);
 

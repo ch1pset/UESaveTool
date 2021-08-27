@@ -75,8 +75,9 @@ export class Writer extends FileIO {
 
             case 'IntProperty\0':
                 this.writeInt32(4);
-                this.write(Buffer.alloc(5));
-                this.writeInt32(prop.Value);
+                this.writeInt32(prop.Value[0]);
+                this.write(Buffer.alloc(1));
+                this.writeInt32(prop.Value[1]);
                 break;
 
             case 'FloatProperty\0':
@@ -103,6 +104,7 @@ export class Writer extends FileIO {
                 break;
 
             case 'StructProperty\0':
+                console.log(prop);
                 this.writeInt32(prop.StoredSize);
                 this.write(Buffer.alloc(4));
                 this.writeString(prop.StoredPropertyType);
@@ -120,21 +122,21 @@ export class Writer extends FileIO {
                 this.write(Buffer.alloc(2));
                 this.writeString(prop.ArrayName);
                 this.writeString(prop.ArrayPropertyType);
-                this.writeInt32(prop.StoredSize - (this.tell - start));
+                this.writeInt32(prop.StoredSize - (this.tell - start) - 22);
                 this.write(Buffer.alloc(4));
                 this.writeString(prop.ArrayPropertyName);
                 this.write(Buffer.alloc(17));
                 // console.log(JSON.stringify(prop['value']['array']));
                 // this.writeArrayItems(prop.Array);
                 for(let i = 0; i < prop.Array.length; i++) {
-                    console.log(prop.Array[i]);
+                    // console.log(prop.Array[i]);
                     this.writeProperties(prop.Array[i]);
                 }
                 break;
 
             case 'EnumProperty\0':
                 // console.log(`Enum Prop: ${JSON.stringify(prop)}`);
-                this.writeInt32(4);
+                this.writeInt32(prop.Value.length + 4);
                 this.write(Buffer.alloc(4));
                 this.writeString(prop.EnumType);
                 this.write(Buffer.alloc(1));

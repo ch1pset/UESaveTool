@@ -56,6 +56,7 @@ export class ArrayProperty extends Property {
         array.ArrayName = obj.ArrayName;
         array.ArrayPropertyType = obj.ArrayPropertyType;
         array.ArrayPropertyName = obj.ArrayPropertyName;
+        array.StoredSize = obj.StoredSize;
         array.Array = [];
         obj.Array.forEach((arr) => {
             let pair = [];
