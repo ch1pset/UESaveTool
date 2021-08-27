@@ -12,7 +12,7 @@ import {
     StructProperty,
     ArrayProperty,
     EnumProperty
-} from './index.js'
+} from '../index.js'
 
 export class Reader extends FileIO {
     constructor() {

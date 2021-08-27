@@ -6,7 +6,6 @@ import {
 } from './index.js';
 
 export class Writer extends FileIO {
-    //TODO: Write Serialized data to .sav file
     constructor() {
         super();
     }
@@ -54,14 +53,6 @@ export class Writer extends FileIO {
         }
         this.writeString('None\0');
     }
-    // writeArrayItems(arr) {
-    //     for(let i = 0; i < arr.length; i++) {
-    //         for(let j = 0; j < arr[i]['value'].length; j++) {
-    //             this.writeProperty(arr[i][j]);
-    //         }
-    //         this.writeString('None\0');
-    //     }
-    // }
     writeProperty(prop) {
         this.writeString(prop.Name);
         this.writeString(prop.Type);
@@ -126,16 +117,12 @@ export class Writer extends FileIO {
                 this.write(Buffer.alloc(4));
                 this.writeString(prop.ArrayPropertyName);
                 this.write(Buffer.alloc(17));
-                // console.log(JSON.stringify(prop['value']['array']));
-                // this.writeArrayItems(prop.Array);
                 for(let i = 0; i < prop.Array.length; i++) {
-                    // console.log(prop.Array[i]);
                     this.writeProperties(prop.Array[i]);
                 }
                 break;
 
             case 'EnumProperty\0':
-                // console.log(`Enum Prop: ${JSON.stringify(prop)}`);
                 this.writeInt32(prop.Value.length + 4);
                 this.write(Buffer.alloc(4));
                 this.writeString(prop.EnumType);
