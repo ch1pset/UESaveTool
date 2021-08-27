@@ -81,11 +81,7 @@ export class Reader extends FileIO {
         let data = [];
         let next;
         while((next = this.readString()) !== 'None\0') {
-            if(next !== '') {
-                data.push(this.readProperty(next));
-            } else {
-                data.push(null);
-            }
+            data.push(this.readProperty(next));
         }
         return data;
     }
@@ -122,6 +118,7 @@ export class Reader extends FileIO {
                 length = this.readInt32();
                 this.seek(5);
                 value = this.readString();
+                this.seek(4);
                 return new SoftObjectProperty({name, type, value});
             case 'StructProperty\0':
                 length = this.readInt32();
