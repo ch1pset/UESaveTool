@@ -99,9 +99,7 @@ export class Reader extends FileIO {
             case 'IntProperty\0':
                 length = this.readInt32();
                 let int1 = this.readInt32(); // floor
-                // console.log(`Length: ${length}`);
                 this.seek(1);
-                // this.seek(9);
                 let int2 = this.readInt32();
                 value = [int1, int2]
                 return new IntProperty(name, type, value);
@@ -127,7 +125,6 @@ export class Reader extends FileIO {
                 return new SoftObjectProperty(name, type, value);
             case 'StructProperty\0':
                 length = this.readInt32();
-                console.log(`Sav Struct length: ${length}`);
                 this.seek(4);
                 let stype = this.readString();
                 this.seek(17);
@@ -136,13 +133,11 @@ export class Reader extends FileIO {
             case 'ArrayProperty\0':
                 let start = this.tell;
                 length = this.readInt32(); // stored struct size in bytes
-                console.log(`Sav Array Size: ${length}`);
                 this.seek(4);
             
                 let atype = this.readString();
                 this.seek(1);
                 let alength = this.readInt16();
-                // console.log(`Items in Array: ${alength}`);
                 this.seek(2);
 
                 let aname = this.readString();
@@ -150,9 +145,7 @@ export class Reader extends FileIO {
                 let ptype = this.readString();
                 let toEnd = this.readInt32(); //length - (current offset - start offset)
                 this.seek(4);
-                
-                console.log(`Lenght 1: ${length} FromHere: ${length - (this.tell - start) - 14}`)
-                console.log(`To End: ${toEnd}`)
+
                 let pname = this.readString();
                 this.seek(17);
 

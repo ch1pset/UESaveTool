@@ -23,10 +23,8 @@ function UESerializer()
             io.writeInt32(gvas.CustomFormatData.Entries[i]['Value']);
         }
         io.writeString(gvas.SaveGameType);
-        //TODO Write Properties
         io.writeProperties(gvas.Properties);
         io.write(Buffer.alloc(4));
-        // console.log(gvas.Properties);
     }
     catch(e) {
         console.log(e);

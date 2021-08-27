@@ -95,7 +95,6 @@ export class Writer extends FileIO {
                 break;
 
             case 'StructProperty\0':
-                console.log(prop);
                 this.writeInt32(prop.StoredSize);
                 this.write(Buffer.alloc(4));
                 this.writeString(prop.StoredPropertyType);

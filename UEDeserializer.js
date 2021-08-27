@@ -27,7 +27,6 @@ function UEDeserializer()
         }
         gvas.SaveGameType = io.readString();
         gvas.Properties = io.readProperties();
-        // console.log(`Current Offset: ${io.peek}`);
 
         fs.createWriteStream('./output.json', 'utf8')
             .write(JSON.stringify(gvas, null, 4), (err) => {
