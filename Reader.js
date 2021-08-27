@@ -95,31 +95,31 @@ export class Reader extends FileIO {
                 this.seek(8);
                 value = this.readByte() === 0;
                 this.seek(1);
-                return new BoolProperty({name, type, value});
+                return new BoolProperty(name, type, value);
             case 'IntProperty\0':
                 this.seek(9);
                 value = this.readInt32();
-                return new IntProperty({name, type, value});
+                return new IntProperty(name, type, value);
             case 'FloatProperty\0':
                 this.seek(9);
                 value = this.readFloat();
-                return new FloatProperty({name, type, value});
+                return new FloatProperty(name, type, value);
             case 'StrProperty\0':
                 length = this.readInt32();
                 this.seek(5);
                 value = this.readString();
-                return new StrProperty({name, type, value});
+                return new StrProperty(name, type, value);
             case 'ObjectProperty\0':
                 length = this.readInt32();
                 this.seek(5);
                 value = this.readString();
-                return new ObjectProperty({name, type, value});
+                return new ObjectProperty(name, type, value);
             case 'SoftObjectProperty\0':
                 length = this.readInt32();
                 this.seek(5);
                 value = this.readString();
                 this.seek(4);
-                return new SoftObjectProperty({name, type, value});
+                return new SoftObjectProperty(name, type, value);
             case 'StructProperty\0':
                 length = this.readInt32();
                 console.log(`Sav Struct length: ${length}`);
@@ -127,7 +127,7 @@ export class Reader extends FileIO {
                 let stype = this.readString();
                 this.seek(17);
                 let props = this.readProperties();
-                return new StructProperty({name, type, value}, {stype, props})
+                return new StructProperty(name, type, value, stype, props, length)
             case 'ArrayProperty\0':
                 let start = this.tell;
                 length = this.readInt32(); // stored struct size in bytes
@@ -154,14 +154,14 @@ export class Reader extends FileIO {
                     let propItem = this.readProperties();
                     arr.push(propItem);
                 }
-                return new ArrayProperty({name, type, value}, {atype, aname, ptype, pname, arr});
+                return new ArrayProperty(name, type, value, atype, aname, ptype, pname, arr, length);
             case 'EnumProperty\0':
                 length = this.readInt32();
                 this.seek(4);
                 let etype = this.readString(); //same as type
                 this.seek(1);
                 value = this.readString();
-                return new EnumProperty({name, type, value}, etype);
+                return new EnumProperty(name, type, value, etype);
             default:
                 throw new Error(`Unrecognized Property: ${type}`);
         }

@@ -1,15 +1,25 @@
-import { Property } from './index.js'
+import {
+    Property,
+    BoolProperty,
+    IntProperty,
+    FloatProperty,
+    StrProperty,
+    ObjectProperty,
+    SoftObjectProperty,
+    StructProperty,
+    EnumProperty
+} from './index.js'
 
 export class ArrayProperty extends Property {
-    constructor({name, type, value}, {atype, aname, ptype, pname, arr}) {
-        super({name, type, value});
+    constructor(name, type, value, atype, aname, ptype, pname, arr, length) {
+        super(name, type, value);
         this.ArrayType = atype;
         this.ArrayName = aname;
         this.ArrayPropertyType = ptype;
         this.ArrayPropertyName = pname;
         this.Array = arr;
-
-        console.log(`Generated Array Size: ${this.Size}`);
+        this.StoredSize = length;
+        // console.log(`Generated Array Size: ${this.Size}`);
     }
     get Size() {
         let size = 0;
@@ -36,11 +46,47 @@ export class ArrayProperty extends Property {
             }
             size += 'None\0'.length + 4;
         }
-        // return size + 17 + this.ArrayPropertyName.length + 4 
-        //     + 8 + this.ArrayPropertyType.length + 4
-        //     + this.ArrayName.length + 4
-        //     + 5 + this.ArrayType.length + 4
-        //     + 8;
         return size;
+    }
+    static from(obj) {
+        let array = new ArrayProperty();
+        array.Name = obj.Name;
+        array.Type = obj.Type;
+        array.ArrayType = obj.ArrayType;
+        array.ArrayName = obj.ArrayName;
+        array.ArrayPropertyType = obj.ArrayPropertyType;
+        array.ArrayPropertyName = obj.ArrayPropertyName;
+        array.Array = [];
+        obj.Array.forEach((arr) => {
+            let pair = [];
+            arr.forEach((prop) => {
+                switch(prop.Type)
+                {
+                    case 'BoolProperty\0':
+                        pair.push(BoolProperty.from(prop));
+                        break;
+                    case 'IntProperty\0':
+                        pair.push(IntProperty.from(prop));
+                        break;
+                    case 'FloatProperty\0':
+                        pair.push(FloatProperty.from(prop));
+                        break;
+                    case 'StrProperty\0':
+                        pair.push(StrProperty.from(prop));
+                        break;
+                    case 'ObjectProperty\0':
+                        pair.push(ObjectProperty.from(prop));
+                        break;
+                    case 'SoftObjectProperty\0':
+                        pair.push(SoftObjectProperty.from(prop));
+                        break;
+                    case 'EnumProperty\0':
+                        pair.push(EnumProperty.from(prop));
+                        break;
+                }
+            })
+            array.Array.push(pair);
+        })
+        return array;
     }
 }

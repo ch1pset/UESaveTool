@@ -1,5 +1,9 @@
 import { Buffer } from 'buffer';
-import { FileIO, dword, word } from './index.js';
+import { 
+    FileIO, 
+    dword, 
+    word
+} from './index.js';
 
 export class Writer extends FileIO {
     //TODO: Write Serialized data to .sav file
@@ -46,91 +50,95 @@ export class Writer extends FileIO {
     }
     writeProperties(props) {
         for(let i = 0; i < props.length; i++) {
-            if(props[i]['name'] !== null)
-                this.writeProperty(props[i]);
-            else
-                this.writeString('');
+            this.writeProperty(props[i]);
         }
         this.writeString('None\0');
     }
-    writeArrayItems(arr) {
-        for(let i = 0; i < arr.length; i++) {
-            for(let j = 0; j < arr[i]['value'].length; j++) {
-                let item = arr[i]['value'][j];
-                if(item['name'] !== null)
-                    this.writeProperty(item);
-                else
-                    this.write(Buffer.alloc(4));
-            }
-            this.writeString('None\0');
-        }
-    }
+    // writeArrayItems(arr) {
+    //     for(let i = 0; i < arr.length; i++) {
+    //         for(let j = 0; j < arr[i]['value'].length; j++) {
+    //             this.writeProperty(arr[i][j]);
+    //         }
+    //         this.writeString('None\0');
+    //     }
+    // }
     writeProperty(prop) {
-        this.writeString(prop['name']);
-        this.writeString(prop['type']);
-        switch(prop.type)
+        this.writeString(prop.Name);
+        this.writeString(prop.Type);
+        switch(prop.Type)
         {
             case 'BoolProperty\0':
                 this.writeInt32(1);
-                this.write(Buffer.from(prop['value'] ? 1 : 0, 0, 1));
+                this.write(Buffer.from(prop.Value ? 1 : 0, 0, 1));
                 this.write(Buffer.alloc(1));
                 break;
 
             case 'IntProperty\0':
                 this.writeInt32(4);
                 this.write(Buffer.alloc(5));
-                this.writeInt32(prop['value']);
+                this.writeInt32(prop.Value);
                 break;
 
             case 'FloatProperty\0':
                 this.writeInt32(4);
                 this.write(Buffer.alloc(5));
-                this.writeFloat(prop['value']);
+                this.writeFloat(prop.Value);
                 break;
 
             case 'StrProperty\0':
-            case 'ObjectProperty\0':
-                this.writeInt32(prop['value'].length + 4);
+                this.writeInt32(prop.Value.length + 4);
                 this.write(Buffer.alloc(5));
-                this.writeString(prop['value']);
+                this.writeString(prop.Value);
+                break;
+            case 'ObjectProperty\0':
+                this.writeInt32(prop.Value.length + 4);
+                this.write(Buffer.alloc(5));
+                this.writeString(prop.Value);
                 break;
             case 'SoftObjectProperty\0':
-                this.writeInt32(prop['value'].length + 8);
+                this.writeInt32(prop.Value.length + 8);
                 this.write(Buffer.alloc(5));
-                this.writeString(prop['value']);
+                this.writeString(prop.Value);
+                this.write(Buffer.alloc(4));
                 break;
 
             case 'StructProperty\0':
-                this.writeInt32(prop['value']['size']);
+                this.writeInt32(prop.StoredSize);
                 this.write(Buffer.alloc(4));
-                this.writeString(prop['value']['type']);
+                this.writeString(prop.StoredPropertyType);
                 this.write(Buffer.alloc(17));
-                this.writeProperties(prop['value']['properties']);
+                this.writeProperties(prop.Properties);
                 break;
 
             case 'ArrayProperty\0':
-                this.writeInt32(prop['value']['size']);
+                let start = this.tell;
+                this.writeInt32(prop.StoredSize);
                 this.write(Buffer.alloc(4));
-                this.writeString(prop['value']['type']);
-                this.writeInt32(prop['value']['unkown']);
+                this.writeString(prop.ArrayType);
                 this.write(Buffer.alloc(1));
-                this.writeString(prop['value']['name']);
-                this.writeString(prop['value']['array']['type']);
-                this.writeInt32(prop['value']['array']['size']);
+                this.writeInt16(prop.Array.length);
+                this.write(Buffer.alloc(2));
+                this.writeString(prop.ArrayName);
+                this.writeString(prop.ArrayPropertyType);
+                this.writeInt32(prop.StoredSize - (this.tell - start));
                 this.write(Buffer.alloc(4));
-                this.writeString(prop['value']['array']['name']);
+                this.writeString(prop.ArrayPropertyName);
                 this.write(Buffer.alloc(17));
                 // console.log(JSON.stringify(prop['value']['array']));
-                this.writeArrayItems(prop['value']['array']['data']);
+                // this.writeArrayItems(prop.Array);
+                for(let i = 0; i < prop.Array.length; i++) {
+                    console.log(prop.Array[i]);
+                    this.writeProperties(prop.Array[i]);
+                }
                 break;
 
             case 'EnumProperty\0':
-                console.log(`Enum Prop: ${JSON.stringify(prop)}`);
+                // console.log(`Enum Prop: ${JSON.stringify(prop)}`);
                 this.writeInt32(4);
                 this.write(Buffer.alloc(4));
-                this.writeString(prop['value']['type']);
+                this.writeString(prop.EnumType);
                 this.write(Buffer.alloc(1));
-                this.writeString(prop['value']['value']);
+                this.writeString(prop.Value);
                 break;
                 
             default:

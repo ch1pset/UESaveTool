@@ -7,7 +7,7 @@ function UESerializer()
     // console.log(JSON.stringify(gvas));
     const io = new Writer();
     try {
-        io.open('./output.sav');
+        io.open('./output2.sav');
         io.write(Buffer.from(gvas.Header));
         io.writeInt32(gvas.SaveGameVersion);
         io.writeInt32(gvas.PackageVersion);
@@ -25,6 +25,7 @@ function UESerializer()
         io.writeString(gvas.SaveGameType);
         //TODO Write Properties
         io.writeProperties(gvas.Properties);
+        // console.log(gvas.Properties);
     }
     catch(e) {
         console.log(e);
