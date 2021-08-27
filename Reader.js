@@ -1,4 +1,18 @@
-import { FileIO, dword, word, byte } from './index.js'
+import { 
+    FileIO, 
+    dword, 
+    word, 
+    byte,
+    BoolProperty,
+    IntProperty,
+    FloatProperty,
+    StrProperty,
+    ObjectProperty,
+    SoftObjectProperty,
+    StructProperty,
+    ArrayProperty,
+    EnumProperty
+} from './index.js'
 
 export class Reader extends FileIO {
     constructor() {
@@ -70,8 +84,7 @@ export class Reader extends FileIO {
             if(next !== '') {
                 data.push(this.readProperty(next));
             } else {
-                data.push({'name':null})
-                // console.log(`Empty String at offset: ${this.tell}`);
+                data.push(null);
             }
         }
         return data;
@@ -86,77 +99,73 @@ export class Reader extends FileIO {
                 this.seek(8);
                 value = this.readByte() === 0;
                 this.seek(1);
-                break;
+                return new BoolProperty({name, type, value});
             case 'IntProperty\0':
                 this.seek(9);
                 value = this.readInt32();
-                break;
+                return new IntProperty({name, type, value});
             case 'FloatProperty\0':
                 this.seek(9);
                 value = this.readFloat();
-                break;
+                return new FloatProperty({name, type, value});
             case 'StrProperty\0':
+                length = this.readInt32();
+                this.seek(5);
+                value = this.readString();
+                return new StrProperty({name, type, value});
             case 'ObjectProperty\0':
+                length = this.readInt32();
+                this.seek(5);
+                value = this.readString();
+                return new ObjectProperty({name, type, value});
             case 'SoftObjectProperty\0':
                 length = this.readInt32();
                 this.seek(5);
                 value = this.readString();
-                break;
+                return new SoftObjectProperty({name, type, value});
             case 'StructProperty\0':
                 length = this.readInt32();
-                console.log(`Struct length: ${length} bytes`);
                 this.seek(4);
                 let sType = this.readString();
                 this.seek(17);
-                value = {'size':length,'type':sType, 'properties':this.readProperties()};
-                break;
+                value = {'Type':sType, 'Properties':this.readProperties()};
+                return new StructProperty({name, type, value})
             case 'ArrayProperty\0':
+                let start = this.tell;
                 length = this.readInt32();
                 let structSize = length;
                 this.seek(4);
             
-                let structType = this.readString();
-                let someValue = this.readInt32();
+                let atype = this.readString();
                 this.seek(1);
+                let alength = this.readInt16();
+                console.log(`Items in Array: ${alength}`);
+                this.seek(2);
 
-                let arrayName = this.readString();
+                let aname = this.readString();
 
-                let itemType = this.readString();
-                length = this.readInt32();
-                console.log(`Array Size: ${length}`);
-                let start = this.tell;
+                let ptype = this.readString();
+                this.readInt32(); //length - (current offset - start offset)
                 this.seek(4);
 
-                let itemName = this.readString();
+                let pname = this.readString();
                 this.seek(17);
 
-                let array = {'size':length, 'type':itemType, 'name':itemName, 'data':[]};
+                let arr = [];
                 while(this.tell < (start + length)) {
-                    let props = this.readProperties();
-                    if(props) {
-                        array.data.push({'value':props});
-                    }
+                    let propItem = this.readProperties();
+                    arr.push(propItem);
                 }
-                console.log(`Array read has ${array.data.length} items`);
-                value = {
-                    'size':structSize,
-                    'type':structType,
-                    'unkown':someValue,
-                    'name':arrayName,
-                    'array':array
-                }
-                break;
+                return new ArrayProperty({name, type, value}, {atype, aname, ptype, pname, arr});
             case 'EnumProperty\0':
                 length = this.readInt32();
                 this.seek(4);
                 let etype = this.readString(); //same as type
                 this.seek(1);
-                value = {'type':etype, 'value':this.readString()};
-                // console.log(`Prop: {${name}, ${type}, ${value}, ${etype}}`);
-                break;
+                value = {'Type':etype, 'Value':this.readString()};
+                return new EnumProperty({name, type, value});
             default:
                 throw new Error(`Unrecognized Property: ${type}`);
         }
-        return {'name': name, 'type':type, 'value':value};
     }
 }
