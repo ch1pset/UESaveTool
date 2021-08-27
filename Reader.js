@@ -132,8 +132,7 @@ export class Reader extends FileIO {
                 return new StructProperty({name, type, value})
             case 'ArrayProperty\0':
                 let start = this.tell;
-                length = this.readInt32();
-                let structSize = length;
+                length = this.readInt32(); // stored struct size in bytes
                 this.seek(4);
             
                 let atype = this.readString();
