@@ -11,13 +11,13 @@ import {
 } from './index.js'
 
 export class ArrayProperty extends Property {
-    constructor(name, type, value, atype, aname, ptype, pname, arr, length) {
+    constructor(name, type, value, atype, aname, ptype, pname, length) {
         super(name, type, value);
         this.ArrayType = atype;
         this.ArrayName = aname;
         this.ArrayPropertyType = ptype;
         this.ArrayPropertyName = pname;
-        this.Array = arr;
+        // this.Array = arr;
         this.StoredSize = length;
         // console.log(`Generated Array Size: ${this.Size}`);
     }
@@ -57,8 +57,8 @@ export class ArrayProperty extends Property {
         array.ArrayPropertyType = obj.ArrayPropertyType;
         array.ArrayPropertyName = obj.ArrayPropertyName;
         array.StoredSize = obj.StoredSize;
-        array.Array = [];
-        obj.Array.forEach((arr) => {
+        array.Value = [];
+        obj.Value.forEach((arr) => {
             let pair = [];
             arr.forEach((prop) => {
                 switch(prop.Type)
@@ -86,7 +86,7 @@ export class ArrayProperty extends Property {
                         break;
                 }
             })
-            array.Array.push(pair);
+            array.Value.push(pair);
         })
         return array;
     }

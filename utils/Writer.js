@@ -109,7 +109,7 @@ export class Writer extends FileIO {
                 this.write(Buffer.alloc(4));
                 this.writeString(prop.ArrayType);
                 this.write(Buffer.alloc(1));
-                this.writeInt16(prop.Array.length);
+                this.writeInt16(prop.Value.length);
                 this.write(Buffer.alloc(2));
                 this.writeString(prop.ArrayName);
                 this.writeString(prop.ArrayPropertyType);
@@ -117,8 +117,8 @@ export class Writer extends FileIO {
                 this.write(Buffer.alloc(4));
                 this.writeString(prop.ArrayPropertyName);
                 this.write(Buffer.alloc(17));
-                for(let i = 0; i < prop.Array.length; i++) {
-                    this.writeProperties(prop.Array[i]);
+                for(let i = 0; i < prop.Value.length; i++) {
+                    this.writeProperties(prop.Value[i]);
                 }
                 break;
 

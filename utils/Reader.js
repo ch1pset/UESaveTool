@@ -156,12 +156,12 @@ export class Reader extends FileIO {
                 let pname = this.readString();
                 this.seek(17);
 
-                let arr = [];
+                value = [];
                 while(this.tell < (start + length)) {
                     let propItem = this.readProperties();
-                    arr.push(propItem);
+                    value.push(propItem);
                 }
-                return new ArrayProperty(name, type, value, atype, aname, ptype, pname, arr, length);
+                return new ArrayProperty(name, type, value, atype, aname, ptype, pname, length);
             case 'EnumProperty\0':
                 length = this.readInt32();
                 this.seek(4);
