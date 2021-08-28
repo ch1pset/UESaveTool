@@ -1,8 +1,8 @@
 import { Property } from './index.js'
 
 export class IntProperty extends Property {
-    constructor(name, type, value) {
-        super(name, type, value);
+    constructor(name, type, prop) {
+        super(name, type, prop);
     }
     get Size() {
         return this.Name.length + this.Type.length + 21;

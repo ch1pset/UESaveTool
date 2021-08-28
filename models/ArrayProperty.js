@@ -11,8 +11,8 @@ import {
 } from './index.js'
 
 export class ArrayProperty extends Property {
-    constructor(name, type, value, stype) {
-        super(name, type, value);
+    constructor(name, type, prop, stype) {
+        super(name, type, prop);
         this.StoredPropertyType = stype;
         // this.ArrayName = aname;
         // this.ArrayPropertyType = ptype;
@@ -47,7 +47,7 @@ export class ArrayProperty extends Property {
         // array.ArrayPropertyType = obj.ArrayPropertyType;
         // array.ArrayPropertyName = obj.ArrayPropertyName;
         // array.StoredSize = obj.StoredSize;
-        array.Value = [];
+        array.prop = [];
         // obj.Value.forEach((prop) => {
         //     switch(prop.Type)
         //     {
