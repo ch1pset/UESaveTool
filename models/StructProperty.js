@@ -11,11 +11,11 @@ import {
 } from './index.js'
 
 export class StructProperty extends Property {
-    constructor(name, type, value, stype, props, length) {
+    constructor(name, type, value, stype, props) {
         super(name, type, value);
         this.StoredPropertyType = stype;
         this.Properties = props;
-        this.StoredSize = length;
+        // this.StoredSize = length;
         // console.log(`Generated Struct Length: ${this.Size}`)
     }
     get Size() {
@@ -37,7 +37,7 @@ export class StructProperty extends Property {
         struct.Name = obj.Name;
         struct.Type = obj.Type;
         struct.StoredPropertyType = obj.StoredPropertyType;
-        struct.StoredSize = obj.StoredSize;
+        // struct.StoredSize = obj.StoredSize;
         struct.Properties = [];
         obj.Properties.forEach((prop) => {
             switch(prop.Type)

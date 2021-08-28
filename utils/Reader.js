@@ -129,35 +129,28 @@ export class Reader extends FileIO {
                 let stype = this.readString();
                 this.seek(17);
                 let props = this.readProperties();
-                return new StructProperty(name, type, value, stype, props, length)
+                return new StructProperty(name, type, value, stype, props)
             case 'ArrayProperty\0':
                 let start = this.tell;
                 length = this.readInt32(); // stored struct size in bytes
                 this.seek(4);
-            
                 let atype = this.readString();
                 this.seek(1);
-                let start2 = this.tell;
+                // let start2 = this.tell;
                 let alength = this.readInt16();
                 this.seek(2);
-
                 let aname = this.readString();
-
                 let ptype = this.readString();
-                let toEnd = this.readInt32(); //length - (current offset - start offset)
+                let toEnd = this.readInt32(); //length - ((this.tell - start2) + pname.length + 29)
                 this.seek(4);
-                
                 let pname = this.readString();
                 this.seek(17);
-                
-                // console.log(`Total Length: ${length}  To End: ${toEnd}  Calculated: ${length - (this.tell - start2)}`)
-
                 value = [];
                 while(this.tell < (start + length)) {
                     let propItem = this.readProperties();
                     value.push(propItem);
                 }
-                return new ArrayProperty(name, type, value, atype, aname, ptype, pname, length);
+                return new ArrayProperty(name, type, value, atype, aname, ptype, pname);
             case 'EnumProperty\0':
                 length = this.readInt32();
                 this.seek(4);

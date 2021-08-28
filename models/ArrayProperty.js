@@ -11,14 +11,14 @@ import {
 } from './index.js'
 
 export class ArrayProperty extends Property {
-    constructor(name, type, value, atype, aname, ptype, pname, length) {
+    constructor(name, type, value, atype, aname, ptype, pname) {
         super(name, type, value);
         this.ArrayType = atype;
         this.ArrayName = aname;
         this.ArrayPropertyType = ptype;
         this.ArrayPropertyName = pname;
         // this.Array = arr;
-        this.StoredSize = length;
+        // this.StoredSize = length;
         // console.log(`Generated Array Size: ${this.Size}`);
     }
     get Size() {
@@ -46,7 +46,7 @@ export class ArrayProperty extends Property {
         array.ArrayName = obj.ArrayName;
         array.ArrayPropertyType = obj.ArrayPropertyType;
         array.ArrayPropertyName = obj.ArrayPropertyName;
-        array.StoredSize = obj.StoredSize;
+        // array.StoredSize = obj.StoredSize;
         array.Value = [];
         obj.Value.forEach((arr) => {
             let pair = [];
