@@ -132,8 +132,8 @@ export class Reader extends FileIO {
                 this.seek(4);
                 let stype = this.readString();
                 this.seek(17);
-                let props = this.readProperties();
-                return new StructProperty(name, type, value, stype, props)
+                value = this.readProperties();
+                return new StructProperty(name, type, value, stype)
 
             case 'ArrayProperty\0':
                 this.seek(4);
@@ -174,12 +174,12 @@ export class Reader extends FileIO {
                         this.seek(4);
                         struct.StoredPropertyType = this.readString();
                         this.seek(17);
-                        struct.Properties = []
+                        struct.Value = [];
                         while(i < alength) {
-                            struct.Properties.push(this.readProperties());
+                            struct.Value.push(this.readProperties());
                             i++;
                         }
-                        console.log(struct);
+                        // console.log(struct);
                         value = struct;
                         break;
                 }
