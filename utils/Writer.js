@@ -59,8 +59,11 @@ export class Writer extends FileIO {
         switch(prop.Type)
         {
             case 'BoolProperty\0':
+                let buf = Buffer.alloc(1);
+                buf.writeUInt8(prop.Value ? 1 : 0);
                 this.writeInt32(1);
-                this.write(Buffer.from(prop.Value ? 1 : 0, 0, 1));
+                this.write(Buffer.alloc(4));
+                this.write(buf);
                 this.write(Buffer.alloc(1));
                 break;
 
