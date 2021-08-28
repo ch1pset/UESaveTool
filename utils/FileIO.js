@@ -15,9 +15,9 @@ export class FileIO {
     seek(numBytes) {
         return (this._pos += numBytes);
     }
-    open(path) {
-        if(!fs.existsSync(path))
-            fs.writeFileSync(path, '');    
+    open(path, mode) {
+        if((mode && mode.includes('w')) || !fs.existsSync(path))
+            fs.writeFileSync(path, '');
         this._fd = fs.openSync(path, 'r+');
     }
     close() {
