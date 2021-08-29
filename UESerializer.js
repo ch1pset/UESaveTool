@@ -5,7 +5,7 @@ import { Writer } from './utils/index.js';
 function UESerializer() 
 {
     const gvas = Gvas.fromFile(process.argv[2]);
-    // console.log(JSON.stringify(gvas));
+    // console.log(gvas);
     const io = new Writer();
     try {
         io.open('./output.sav', 'w');
