@@ -14,9 +14,6 @@ export class StructProperty extends Property {
     constructor(name, type, prop, stype) {
         super(name, type, prop);
         this.StoredPropertyType = stype;
-        // this.Properties = props;
-        // this.StoredSize = length;
-        // console.log(`Generated Struct Length: ${this.Size}`)
     }
     get Size() {
         let size = 0;
@@ -37,7 +34,6 @@ export class StructProperty extends Property {
         struct.Name = obj.Name;
         struct.Type = obj.Type;
         struct.StoredPropertyType = obj.StoredPropertyType;
-        // struct.StoredSize = obj.StoredSize;
         struct.Property = [];
         obj.Property.forEach((prop) => {
             switch(prop.Type)

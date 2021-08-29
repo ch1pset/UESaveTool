@@ -1,5 +1,4 @@
 import * as fs from 'fs';
-import { Buffer } from 'buffer';
 import { 
     BoolProperty,
     IntProperty,
@@ -74,7 +73,7 @@ export class Gvas {
                     gvas.Properties.push(EnumProperty.from(prop));
                     break;
                 default:
-                    throw new Error(`Unrecognized Property: ${prop.Type}`);
+                    throw new Error(`Unrecognized Property '${prop.Type}' Generating Gvas`);
             }
         })
         return gvas;
