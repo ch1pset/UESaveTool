@@ -80,7 +80,12 @@ export class Reader extends FileIO {
         while((next = this.readString()) !== 'None\0') {
             let type = this.readString();
             let length = this.readInt32();
-            data.push(this.readProperty(next, type, length));
+            let prop = this.readProperty(next, type, length)
+            if(type === 'ArrayProperty\0') {
+                // console.log(prop.Property.Property);
+                console.log(`Array Calculated Size: ${prop.Size}\n`);
+            }
+            data.push(prop);
         }
         return data;
     }
@@ -141,6 +146,7 @@ export class Reader extends FileIO {
                 this.seek(2);
                 console.log(`StoredType: ${atype} Items in Array: ${alength}`)
                 prop = this.readArray(atype, alength);
+                // console.log(this.readBytes(length));
                 return new ArrayProperty(name, type, prop, atype);
 
             case 'EnumProperty\0':
@@ -186,8 +192,7 @@ export class Reader extends FileIO {
     }
     readIntArray(alength) {
         let array = []
-        let i = 0;
-        while(i < alength) {
+        for(let i = 0; i < alength; i++) {
             let int = {};
             int.Name = this.readString();
             int.Type = this.readString();
@@ -199,28 +204,23 @@ export class Reader extends FileIO {
             let int2 = (int.Type === 'IntProperty\0') ? this.readInt32() : this.readFloat();
             int.Property = [int1, int2]
             array.push(int);
-            i++;
             console.log(`Int Bytes Read: ${this.tell - start - 1}`)
         }
         return array;
     }
     readSoftObjectArray(alength) {
         let array = [];
-        let i = 0;
-        while(i < alength) {
+        for(let i = 0; i < alength; i++) {
             array.push(this.readString());
             this.seek(4);
-            i++;
         }
         return array;
     }
     readStructArray(alength) {
         let array = []
-        let i = 0;
         let start = this.tell;
-        while(i < alength) {
+        for(let i = 0; i < alength; i++) {
             array.push({Value:this.readProperties()});
-            i++;
         }
         console.log(`Struct Bytes Read: ${this.tell - start}`)
         return array;
