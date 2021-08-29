@@ -83,12 +83,12 @@ export class Reader extends FileIO {
         while((next = this.readString()) !== 'None\0') {
             let type = this.readString();
             let length = this.readInt32();
-            data.push(this.readProperty(next, type));
+            data.push(this.readProperty(next, type, length));
         }
         return data;
     }
 
-    readProperty(name, type) {
+    readProperty(name, type, length) {
         // let start = this.tell;
         let prop;
         // console.log(`Name: ${name} Type: ${type} Size: ${length}`)
@@ -96,7 +96,7 @@ export class Reader extends FileIO {
         {
             case 'BoolProperty\0':
                 this.seek(4);
-                prop = this.readByte() === 0;
+                prop = this.readByte() === 1;
                 this.seek(1);
                 return new BoolProperty(name, type, prop);
 
@@ -136,6 +136,7 @@ export class Reader extends FileIO {
                 return new StructProperty(name, type, prop, stype)
 
             case 'ArrayProperty\0':
+                console.log(`Bytes to be Read: ${length}`)
                 this.seek(4);
                 let atype = this.readString();
                 this.seek(1);
@@ -153,40 +154,24 @@ export class Reader extends FileIO {
                 return new EnumProperty(name, type, prop, etype);
 
             default:
-                throw new Error(`Unrecognized Property: ${type}`);
+                throw new Error(`Unrecognized Property '${type}' at offset 0x${(this.tell.toString(16))}`);
         }
     }
 
     readArray(atype, alength) {
-        let i = 0;
+        let start = this.tell;
+        let ret;
         switch(atype)
         {
             case 'IntProperty\0':
                 this.seek((alength > 1) ? 8 : 4);
-                let array = []
-                while(i < alength) {
-                    let int = {};
-                    int.Name = this.readString();
-                    int.Type = this.readString();
-                    this.readInt32(); // 4 bit size
-                    int.Property = []
-                    let int1 = (int.Type === 'IntProperty\0') ? this.readInt32() : this.readFloat();
-                    this.seek(1);
-                    let int2 = (int.Type === 'IntProperty\0') ? this.readInt32() : this.readFloat();
-                    int.Property = [int1, int2]
-                    array.push(int);
-                    console.log(int);
-                    i++;
-                }
-                return array;
+                ret = this.readIntArray(alength);
+                console.log(`Bytes Read: ${this.tell - start + 4}`);
+                return ret;
             case 'SoftObjectProperty\0':
-                let soft = [];
-                while(i < alength) {
-                    soft.push(this.readString());
-                    this.seek(4);
-                    i++;
-                }
-                return soft;
+                ret = this.readSoftObjectArray(alength);
+                console.log(`Bytes Read: ${this.tell - start + 4}`);
+                return ret;
             case 'StructProperty\0':
                 let struct = {};
                 struct.Name = this.readString();
@@ -195,14 +180,50 @@ export class Reader extends FileIO {
                 this.seek(4);
                 struct.StoredPropertyType = this.readString();
                 this.seek(17);
-                struct.Property = [];
-                while(i < alength) {
-                    struct.Property.push({Value:this.readProperties()});
-                    i++;
-                }
+                struct.Property = this.readStructArray(alength);
+                console.log(`Bytes Read: ${this.tell - start + 4}`);
                 return struct;
             default:
-                throw new Error(`Unrecognized Property Reading Array: ${atype}`)
+                throw new Error(`Unrecognized Property '${atype}' Reading Array at offset 0x${this.tell.toString(16)}`)
         }
+    }
+    readIntArray(alength) {
+        let array = []
+        let i = 0;
+        while(i < alength) {
+            let int = {};
+            int.Name = this.readString();
+            int.Type = this.readString();
+            let start = this.tell;
+            this.readInt32(); // = 4
+            int.Property = []
+            let int1 = (int.Type === 'IntProperty\0') ? this.readInt32() : this.readFloat();
+            this.seek(1);
+            let int2 = (int.Type === 'IntProperty\0') ? this.readInt32() : this.readFloat();
+            int.Property = [int1, int2]
+            array.push(int);
+            i++;
+            console.log(`Int Bytes Read: ${this.tell - start - 1}`)
+        }
+        return array;
+    }
+    readSoftObjectArray(alength) {
+        let array = [];
+        let i = 0;
+        while(i < alength) {
+            array.push(this.readString());
+            this.seek(4);
+            i++;
+        }
+        return array;
+    }
+    readStructArray(alength) {
+        let array = []
+        let i = 0;
+        while(i < alength) {
+            array.push({Value:this.readProperties()});
+            i++;
+        }
+        return array;
     }
 }
