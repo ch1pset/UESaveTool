@@ -9,3 +9,4 @@ export { SoftObjectProperty } from './SoftObjectProperty.js'
 export { StructProperty } from './StructProperty.js';
 export { ArrayProperty } from './ArrayProperty.js';
 export { EnumProperty } from './EnumProperty.js';
+export { TupleProperty } from './TupleProperty.js';

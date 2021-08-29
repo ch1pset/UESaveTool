@@ -5,7 +5,9 @@ export class FloatProperty extends Property {
         super(name, type, prop);
     }
     get Size() {
-        return this.Name.length + this.Type.length + 21;
+        return this.Name.length + 4 
+            + this.Type.length + 4
+            + 13;
     }
     static from(obj) {
         let prop = new FloatProperty();

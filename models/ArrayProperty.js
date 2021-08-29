@@ -1,4 +1,9 @@
-import { Property } from './index.js'
+import { 
+    Property,
+    TupleProperty,
+    IntProperty,
+    SoftObjectProperty 
+} from './index.js'
 
 export class ArrayProperty extends Property {
     constructor(name, type, prop, stype) {
@@ -10,7 +15,12 @@ export class ArrayProperty extends Property {
         switch(this.StoredPropertyType)
         {
             case 'IntProperty\0':
-                size += 12; // 4 bit size, 4 bit int, 4 bit int
+                size += this.Property.length > 1 ? 8 : 4;
+                for(let i = 0; i < this.Property.length; i++) {
+                    size += this.Property[i].Name.length + 4;
+                    size += this.Property[i].Type.length + 4;
+                    size += 13;
+                }
                 break;
             case 'SoftObjectProperty\0':
                 for(let i = 0; i < this.Property.length; i++) {
@@ -28,9 +38,8 @@ export class ArrayProperty extends Property {
                 size += 17;
                 let struct = this.Property;
                 for(let i = 0; i < struct.Property.length; i++) {
-                    for(let j = 0; j < struct.Property[i].Value.length; j++) {
-                        size += struct.Property[i].Value[j].Size;
-                    }
+                    size += struct.Property[i].Size;
+                    // console.log(struct.Property[i].Size);
                     size += 9; // 4 bit padding + 5 bit string: 'None\0'
                 }
                 break;
@@ -44,9 +53,7 @@ export class ArrayProperty extends Property {
         let size = 0;
         let struct = this.Property;
         for(let i = 0; i < struct.Property.length; i++) {
-            for(let j = 0; j < struct.Property[i].Value.length; j++) {
-                size += struct.Property[i].Value[j].Size;
-            }
+            size += struct.Size;
             size += 9; // 4 bit padding + 5 bit string: 'None\0'
         }
         return size;
@@ -56,7 +63,20 @@ export class ArrayProperty extends Property {
         array.Name = obj.Name;
         array.Type = obj.Type;
         array.StoredPropertyType = obj.StoredPropertyType;
-        array.Property = obj.Property;
+        array.Property = [];
+        if(obj.StoredPropertyType === 'StructProperty\0') {
+            array.Property = {
+                Name:obj.Property.Name,
+                Type:obj.Property.Type,
+                StoredPropertyType:obj.Property.StoredPropertyType,
+                Property:[]
+            }
+            obj.Property.Property.forEach((prop) => {
+                array.Property.Property.push(TupleProperty.from(prop));
+            });
+        }
+        else
+            array.Property = obj.Property;
         return array;
     }
 }

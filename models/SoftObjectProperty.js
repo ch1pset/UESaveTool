@@ -5,7 +5,26 @@ export class SoftObjectProperty extends Property {
         super(name, type, prop);
     }
     get Size() {
-        return this.Property.length + this.Type.length + this.Name.length + 25;
+        return this.Name.length + 4
+            + this.Type.length + 4 
+            + this.Property.length + 4
+            + 13;
+    }
+    serialize() {
+        let buf = Buffer.alloc(this.Size);
+        let offset = 0;
+        offset = buf.writeInt32LE(this.Name.length, offset);
+        offset += buf.write(this.Name, offset);
+        offset = buf.writeInt32LE(this.Type.length, offset);
+        offset += buf.write(this.Type, offset);
+        offset = buf.writeInt32LE((this.Property.length + 8), offset);
+        offset += 5;
+        offset = buf.writeInt32LE(this.Property.length, offset);
+        offset += buf.write(this.Property, offset);
+        offset += 4;
+        if(offset !== this.Size)
+            throw new Error(`Problem occured during serialization of Property: ${this}`);
+        return buf;
     }
     static from(obj) {
         let prop = new SoftObjectProperty();

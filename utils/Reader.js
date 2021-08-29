@@ -8,7 +8,8 @@ import {
     SoftObjectProperty,
     StructProperty,
     ArrayProperty,
-    EnumProperty
+    EnumProperty,
+    TupleProperty
 } from '../models/index.js'
 
 export class Reader extends FileIO {
@@ -82,11 +83,11 @@ export class Reader extends FileIO {
             let length = this.readInt32();
             let prop = this.readProperty(next, type, length)
             // if(type === 'ArrayProperty\0') {
-                // console.log(prop.Property.Property);
-            //     console.log(`Array Calculated Sizes: ${prop.Size}`);
-            //     if(prop.StoredPropertyType === 'StructProperty\0')
-            //         console.log(`Calculated Struct Size: ${prop.StructSize}`);
-            //     console.log();
+            //     console.log(prop.Property.Property);
+            // //     console.log(`Array Calculated Sizes: ${prop.Size}`);
+            // //     if(prop.StoredPropertyType === 'StructProperty\0')
+            // //         console.log(`Calculated Struct Size: ${prop.StructSize}`);
+            //     // console.log();
             // }
             data.push(prop);
         }
@@ -94,12 +95,12 @@ export class Reader extends FileIO {
     }
 
     readProperty(name, type, length) {
-        // let start = this.tell;
         let prop;
         // console.log(`Name: ${name} Type: ${type} Size: ${length}`)
         switch(type)
         {
             case 'BoolProperty\0':
+                console.log(`Bool length: ${length}`);
                 this.seek(4);
                 prop = this.readByte() === 1;
                 this.seek(1);
@@ -134,14 +135,21 @@ export class Reader extends FileIO {
                 return new SoftObjectProperty(name, type, prop);
 
             case 'StructProperty\0':
+                console.log(`Name: ${name} Type: ${type} Size: ${length}`)
                 this.seek(4);
                 let stype = this.readString();
                 this.seek(17);
+                let start = this.tell;
                 prop = this.readProperties();
-                return new StructProperty(name, type, prop, stype)
+                // console.log(`Struct Size: ${this.tell - start}`);
+                let struct = new StructProperty(name, type, prop, stype)
+                console.log(`Calculated Struct Size: ${struct.Size}`)
+                console.log();
+                return struct;
 
             case 'ArrayProperty\0':
                 // console.log(`Bytes to be Read: ${length}`)
+                // console.log(`Name: ${name} Type: ${type} Size: ${length}`)
                 this.seek(4);
                 let atype = this.readString();
                 this.seek(1);
@@ -149,7 +157,12 @@ export class Reader extends FileIO {
                 this.seek(2);
                 // console.log(`StoredType: ${atype} Items in Array: ${alength}`)
                 prop = this.readArray(atype, alength);
-                return new ArrayProperty(name, type, prop, atype);
+                let arr = new ArrayProperty(name, type, prop, atype);
+                // console.log(arr);
+                // console.log(`Calculated Size: ${arr.Size}`);
+                // console.log(`Calculated Array Size: ${arr.Size}\n`)
+                // console.log();
+                return arr;
 
             case 'EnumProperty\0':
                 this.seek(4);
@@ -164,14 +177,14 @@ export class Reader extends FileIO {
     }
 
     readArray(atype, alength) {
-        // let start = this.tell;
+        let start = this.tell;
         let ret;
         switch(atype)
         {
             case 'IntProperty\0':
                 this.seek((alength > 1) ? 8 : 4);
                 ret = this.readIntArray(alength);
-                // console.log(`Bytes Read: ${this.tell - start + 4}`);
+                // console.log(`Bytes Read: ${this.tell - start}`);
                 return ret;
             case 'SoftObjectProperty\0':
                 ret = this.readSoftObjectArray(alength);
@@ -186,8 +199,9 @@ export class Reader extends FileIO {
                 this.seek(4);
                 struct.StoredPropertyType = this.readString();
                 this.seek(17);
-                struct.Property = this.readStructArray(alength);
+                struct.Property = this.readStructArray(struct.StoredPropertyType, alength);
                 // console.log(`Bytes Read: ${this.tell - start + 4}`);
+
                 return struct;
             default:
                 throw new Error(`Unrecognized Property '${atype}' Reading Array at offset 0x${this.tell.toString(16)}`)
@@ -219,12 +233,13 @@ export class Reader extends FileIO {
         }
         return array;
     }
-    readStructArray(alength) {
+    readStructArray(name, alength) {
         let array = []
         let start = this.tell;
         for(let i = 0; i < alength; i++) {
-            array.push({Value:this.readProperties()});
+            array.push(new TupleProperty(name, this.readProperties()));
         }
+        // console.log(array)
         // console.log(`Struct Bytes Read: ${this.tell - start}`)
         return array;
     }

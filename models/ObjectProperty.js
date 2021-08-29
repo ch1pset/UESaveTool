@@ -5,7 +5,10 @@ export class ObjectProperty extends Property {
         super(name, type, prop);
     }
     get Size() {
-        return this.Property.length + this.Type.length + this.Name.length + 21;
+        return this.Name.length + 4
+            + this.Type.length + 4
+            + this.Property.length + 4 
+            + 9;
     }
     static from(obj) {
         let prop = new ObjectProperty();

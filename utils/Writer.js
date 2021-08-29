@@ -56,9 +56,8 @@ export class Writer extends FileIO {
         {
             case 'BoolProperty\0':
                 let buf = Buffer.alloc(1);
-                buf.writeUInt8(prop.Property ? 1 : 0);
-                this.writeInt32(1);
-                this.write(Buffer.alloc(4));
+                buf.writeUInt8(prop.Property === true ? 1 : 0);
+                this.write(Buffer.alloc(8));
                 this.write(buf);
                 this.write(Buffer.alloc(1));
                 break;
@@ -94,7 +93,7 @@ export class Writer extends FileIO {
                 break;
 
             case 'StructProperty\0':
-                // console.log(`StoredSize: ${prop.StoredSize}  Calc Size: ${prop.Size}`);
+                // console.log(`Calc Size: ${prop.Size}`);
                 this.writeInt32(prop.Size);
                 this.write(Buffer.alloc(4));
                 this.writeString(prop.StoredPropertyType);
@@ -105,7 +104,7 @@ export class Writer extends FileIO {
             case 'ArrayProperty\0':
                 let start = this.tell;
                 // console.log(`\tStoredSize: ${prop.StoredSize}  Calc Size: ${prop.Size}`);
-                this.writeInt32(prop.Size);
+                this.writeInt32(prop.StoredPropertyType !== 'IntProperty\0' ? prop.Size : 12);
                 this.write(Buffer.alloc(4));
                 this.writeString(prop.StoredPropertyType);
                 this.write(Buffer.alloc(1));
@@ -171,7 +170,7 @@ export class Writer extends FileIO {
     }
     writeStructArray(array, length) {
         for(let i = 0; i < length; i++) {
-            this.writeProperties(array[i].Value);
+            this.writeProperties(array[i].Properties);
         }
     }
 }

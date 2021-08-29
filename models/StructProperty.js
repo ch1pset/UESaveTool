@@ -17,13 +17,14 @@ export class StructProperty extends Property {
     }
     get Size() {
         let size = 0;
-        size += 9;
+        // size += this.StoredPropertyType.length + 4;
         for(let i = 0; i < this.Property.length; i++) {
             if(this.Property[i].Type === 'ArrayProperty\0') {
+                // console.log(this.Property[i].Size);
                 size += this.Property[i].Name.length + 4;
                 size += this.Property[i].Type.length + 4;
                 size += this.Property[i].StoredPropertyType.length + 4;
-                size += 9
+                size += 9;
             }
             size += this.Property[i].Size;
         }
@@ -56,9 +57,9 @@ export class StructProperty extends Property {
                 case 'SoftObjectProperty\0':
                     struct.Property.push(SoftObjectProperty.from(prop));
                     break;
-                case 'StructProperty\0':
-                    struct.Property.push(StructProperty.from(prop))
-                    break;
+                // case 'StructProperty\0':
+                //     struct.Property.push(StructProperty.from(prop))
+                //     break;
                 case 'ArrayProperty\0':
                     struct.Property.push(ArrayProperty.from(prop));
                     break;
