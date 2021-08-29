@@ -1,5 +1,6 @@
 import { Buffer } from 'buffer';
-import { Writer, Gvas } from './index.js';
+import { Gvas } from './models/index.js';
+import { Writer } from './utils/index.js';
 
 function UESerializer() 
 {

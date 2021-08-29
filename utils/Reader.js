@@ -1,8 +1,5 @@
-import { 
-    FileIO, 
-    dword, 
-    word, 
-    byte,
+import { FileIO, dword, word, byte } from './index.js'
+import {
     BoolProperty,
     IntProperty,
     FloatProperty,
@@ -12,7 +9,7 @@ import {
     StructProperty,
     ArrayProperty,
     EnumProperty
-} from '../index.js'
+} from '../models/index.js'
 
 export class Reader extends FileIO {
     constructor() {
@@ -176,7 +173,7 @@ export class Reader extends FileIO {
                 let struct = {};
                 struct.Name = this.readString();
                 struct.Type = this.readString();
-                struct.size = this.readInt32();
+                console.log(`Struct Size: ${this.readInt32()}`);
                 this.seek(4);
                 struct.StoredPropertyType = this.readString();
                 this.seek(17);
@@ -220,10 +217,12 @@ export class Reader extends FileIO {
     readStructArray(alength) {
         let array = []
         let i = 0;
+        let start = this.tell;
         while(i < alength) {
             array.push({Value:this.readProperties()});
             i++;
         }
+        console.log(`Struct Bytes Read: ${this.tell - start}`)
         return array;
     }
 }

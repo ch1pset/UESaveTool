@@ -1,6 +1,7 @@
 import * as fs from 'fs';
 import { Buffer } from 'buffer';
-import { Reader, Gvas } from './index.js'
+import { Gvas } from './models/index.js';
+import { Reader } from './utils/index.js';
 
 function UEDeserializer()
 {

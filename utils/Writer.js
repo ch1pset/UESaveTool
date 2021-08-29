@@ -1,9 +1,5 @@
 import { Buffer } from 'buffer';
-import { 
-    FileIO, 
-    dword, 
-    word
-} from './index.js';
+import { FileIO, dword, word } from './index.js';
 
 export class Writer extends FileIO {
     constructor() {
