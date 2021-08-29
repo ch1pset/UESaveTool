@@ -1,6 +1,7 @@
 import * as fs from 'fs';
 import { Buffer } from 'buffer';
-import { Reader, Gvas } from './index.js'
+import { Gvas } from './models/index.js';
+import { Reader } from './utils/index.js';
 
 function UEDeserializer()
 {
@@ -28,10 +29,8 @@ function UEDeserializer()
         gvas.SaveGameType = io.readString();
         gvas.Properties = io.readProperties();
 
-        fs.createWriteStream('./output.json', 'utf8')
-            .write(JSON.stringify(gvas, null, 4), (err) => {
-                if(err) throw err;
-            });
+        fs.writeFileSync('./output.json', JSON.stringify(gvas, null, 4));
+        // console.log(Gvas.fromFile('./output.json'));
     } catch(e) {
         console.log(e);
     } finally {

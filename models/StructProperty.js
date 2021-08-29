@@ -11,24 +11,21 @@ import {
 } from './index.js'
 
 export class StructProperty extends Property {
-    constructor(name, type, value, stype, props) {
-        super(name, type, value);
+    constructor(name, type, prop, stype) {
+        super(name, type, prop);
         this.StoredPropertyType = stype;
-        this.Properties = props;
-        // this.StoredSize = length;
-        // console.log(`Generated Struct Length: ${this.Size}`)
     }
     get Size() {
         let size = 0;
         size += 9;
-        for(let i = 0; i < this.Properties.length; i++) {
-            if(this.Properties[i].Type === 'ArrayProperty\0') {
-                size += this.Properties[i].Name.length + 4;
-                size += this.Properties[i].Type.length + 4;
-                size += this.Properties[i].ArrayType.length + 4;
+        for(let i = 0; i < this.Property.length; i++) {
+            if(this.Property[i].Type === 'ArrayProperty\0') {
+                size += this.Property[i].Name.length + 4;
+                size += this.Property[i].Type.length + 4;
+                size += this.Property[i].StoredPropertyType.length + 4;
                 size += 9
             }
-            size += this.Properties[i].Size;
+            size += this.Property[i].Size;
         }
         return size;
     }
@@ -37,37 +34,39 @@ export class StructProperty extends Property {
         struct.Name = obj.Name;
         struct.Type = obj.Type;
         struct.StoredPropertyType = obj.StoredPropertyType;
-        // struct.StoredSize = obj.StoredSize;
-        struct.Properties = [];
-        obj.Properties.forEach((prop) => {
+        struct.Property = [];
+        obj.Property.forEach((prop) => {
             switch(prop.Type)
             {
                 case 'BoolProperty\0':
-                    struct.Properties.push(BoolProperty.from(prop));
+                    struct.Property.push(BoolProperty.from(prop));
                     break;
                 case 'IntProperty\0':
-                    struct.Properties.push(IntProperty.from(prop));
+                    struct.Property.push(IntProperty.from(prop));
                     break;
                 case 'FloatProperty\0':
-                    struct.Properties.push(FloatProperty.from(prop));
+                    struct.Property.push(FloatProperty.from(prop));
                     break;
                 case 'StrProperty\0':
-                    struct.Properties.push(StrProperty.from(prop));
+                    struct.Property.push(StrProperty.from(prop));
                     break;
                 case 'ObjectProperty\0':
-                    struct.Properties.push(ObjectProperty.from(prop));
+                    struct.Property.push(ObjectProperty.from(prop));
                     break;
                 case 'SoftObjectProperty\0':
-                    struct.Properties.push(SoftObjectProperty.from(prop));
+                    struct.Property.push(SoftObjectProperty.from(prop));
+                    break;
+                case 'StructProperty\0':
+                    struct.Property.push(StructProperty.from(prop))
                     break;
                 case 'ArrayProperty\0':
-                    struct.Properties.push(ArrayProperty.from(prop));
+                    struct.Property.push(ArrayProperty.from(prop));
                     break;
                 case 'EnumProperty\0':
-                    struct.Properties.push(EnumProperty.from(prop));
+                    struct.Property.push(EnumProperty.from(prop));
                     break;
                 default:
-                    throw new Error(`Unrecognized Property: ${prop.Type}`);
+                    throw new Error(`Unrecognized Property at Struct Creation: ${prop.Type}`);
             }
         })
         return struct;

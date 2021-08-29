@@ -1,9 +1,5 @@
 import { Buffer } from 'buffer';
-import { 
-    FileIO, 
-    dword, 
-    word
-} from './index.js';
+import { FileIO, dword, word } from './index.js';
 
 export class Writer extends FileIO {
     constructor() {
@@ -60,7 +56,7 @@ export class Writer extends FileIO {
         {
             case 'BoolProperty\0':
                 let buf = Buffer.alloc(1);
-                buf.writeUInt8(prop.Value ? 1 : 0);
+                buf.writeUInt8(prop.Property ? 1 : 0);
                 this.writeInt32(1);
                 this.write(Buffer.alloc(4));
                 this.write(buf);
@@ -69,31 +65,31 @@ export class Writer extends FileIO {
 
             case 'IntProperty\0':
                 this.writeInt32(4);
-                this.writeInt32(prop.Value[0]);
+                this.writeInt32(prop.Property[0]);
                 this.write(Buffer.alloc(1));
-                this.writeInt32(prop.Value[1]);
+                this.writeInt32(prop.Property[1]);
                 break;
 
             case 'FloatProperty\0':
                 this.writeInt32(4);
                 this.write(Buffer.alloc(5));
-                this.writeFloat(prop.Value);
+                this.writeFloat(prop.Property);
                 break;
 
             case 'StrProperty\0':
-                this.writeInt32(prop.Value.length + 4);
+                this.writeInt32(prop.Property.length + 4);
                 this.write(Buffer.alloc(5));
-                this.writeString(prop.Value);
+                this.writeString(prop.Property);
                 break;
             case 'ObjectProperty\0':
-                this.writeInt32(prop.Value.length + 4);
+                this.writeInt32(prop.Property.length + 4);
                 this.write(Buffer.alloc(5));
-                this.writeString(prop.Value);
+                this.writeString(prop.Property);
                 break;
             case 'SoftObjectProperty\0':
-                this.writeInt32(prop.Value.length + 8);
+                this.writeInt32(prop.Property.length + 8);
                 this.write(Buffer.alloc(5));
-                this.writeString(prop.Value);
+                this.writeString(prop.Property);
                 this.write(Buffer.alloc(4));
                 break;
 
@@ -103,7 +99,7 @@ export class Writer extends FileIO {
                 this.write(Buffer.alloc(4));
                 this.writeString(prop.StoredPropertyType);
                 this.write(Buffer.alloc(17));
-                this.writeProperties(prop.Properties);
+                this.writeProperties(prop.Property);
                 break;
 
             case 'ArrayProperty\0':
@@ -111,33 +107,71 @@ export class Writer extends FileIO {
                 // console.log(`\tStoredSize: ${prop.StoredSize}  Calc Size: ${prop.Size}`);
                 this.writeInt32(prop.Size);
                 this.write(Buffer.alloc(4));
-                this.writeString(prop.ArrayType);
+                this.writeString(prop.StoredPropertyType);
                 this.write(Buffer.alloc(1));
-                let start2 = this.tell;
-                this.writeInt16(prop.Value.length);
+                // let start2 = this.tell;
+                this.writeInt16(prop.Property.length);
                 this.write(Buffer.alloc(2));
-                this.writeString(prop.ArrayName);
-                this.writeString(prop.ArrayPropertyType);
-                let diff = this.tell - start2;
-                this.writeInt32(prop.Size - (diff + 8 + prop.ArrayPropertyName.length + 4 + 17));
-                this.write(Buffer.alloc(4));
-                this.writeString(prop.ArrayPropertyName);
-                this.write(Buffer.alloc(17));
-                for(let i = 0; i < prop.Value.length; i++) {
-                    this.writeProperties(prop.Value[i]);
-                }
+                this.writeArray(prop.Property, prop.StoredPropertyType);
                 break;
 
             case 'EnumProperty\0':
-                this.writeInt32(prop.Value.length + 4);
+                this.writeInt32(prop.Property.length + 4);
                 this.write(Buffer.alloc(4));
                 this.writeString(prop.EnumType);
                 this.write(Buffer.alloc(1));
-                this.writeString(prop.Value);
+                this.writeString(prop.Property);
                 break;
                 
             default:
-                throw new Error(`Unrecognized Property: ${prop.Type}`);
+                throw new Error(`Unrecognized Property '${prop.Type}' Writing Property`);
+        }
+    }
+    writeArray(prop, type) {
+        switch(type)
+        {
+            case 'IntProperty\0':
+                this.write(Buffer.alloc(prop.length > 1 ? 8 : 4));
+                this.writeIntArray(prop, prop.length);
+                break;
+            case 'SoftObjectProperty\0':
+                this.writeSoftObjectArray(prop, prop.length)
+                break;
+            case 'StructProperty\0':
+                this.writeString(prop.Name);
+                this.writeString(prop.Type);
+                this.writeInt32(prop.StructSize)
+                this.write(Buffer.alloc(4));
+                this.writeString(prop.StoredPropertyType);
+                this.write(Buffer.alloc(17));
+                this.writeStructArray(prop.Property, prop.Property.length);
+                break;
+            default:
+                throw new Error(`Urecognized Property '${type}' Writing Array`);
+        }
+    }
+    writeIntArray(array, length) {
+        for(let i = 0; i < length; i++) {
+            this.writeString(array[i].Name);
+            this.writeString(array[i].Type);
+            this.writeInt32(4);
+            this.writeInt32(array[i].Property[0]);
+            this.write(Buffer.alloc(1));
+            if(array[i].Type === 'IntProperty\0')
+                this.writeInt32(array[i].Property[1]);
+            else
+                this.writeFloat(array[i].Property[1]);
+        }
+    }
+    writeSoftObjectArray(array, length) {
+        for(let i = 0; i < length; i++) {
+            this.writeString(array[i]);
+            this.write(Buffer.alloc(4));
+        }
+    }
+    writeStructArray(array, length) {
+        for(let i = 0; i < length; i++) {
+            this.writeProperties(array[i].Value);
         }
     }
 }

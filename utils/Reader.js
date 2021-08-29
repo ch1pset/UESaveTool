@@ -1,8 +1,5 @@
-import { 
-    FileIO, 
-    dword, 
-    word, 
-    byte,
+import { FileIO, dword, word, byte } from './index.js'
+import {
     BoolProperty,
     IntProperty,
     FloatProperty,
@@ -12,7 +9,7 @@ import {
     StructProperty,
     ArrayProperty,
     EnumProperty
-} from '../index.js'
+} from '../models/index.js'
 
 export class Reader extends FileIO {
     constructor() {
@@ -81,85 +78,154 @@ export class Reader extends FileIO {
         let data = [];
         let next;
         while((next = this.readString()) !== 'None\0') {
-            data.push(this.readProperty(next));
+            let type = this.readString();
+            let length = this.readInt32();
+            let prop = this.readProperty(next, type, length)
+            // if(type === 'ArrayProperty\0') {
+                // console.log(prop.Property.Property);
+            //     console.log(`Array Calculated Sizes: ${prop.Size}`);
+            //     if(prop.StoredPropertyType === 'StructProperty\0')
+            //         console.log(`Calculated Struct Size: ${prop.StructSize}`);
+            //     console.log();
+            // }
+            data.push(prop);
         }
         return data;
     }
 
-    readProperty(name) {
-        let type = this.readString();
-        let value, length;
+    readProperty(name, type, length) {
+        // let start = this.tell;
+        let prop;
+        // console.log(`Name: ${name} Type: ${type} Size: ${length}`)
         switch(type)
         {
             case 'BoolProperty\0':
-                this.seek(8);
-                value = this.readByte() === 0;
+                this.seek(4);
+                prop = this.readByte() === 1;
                 this.seek(1);
-                return new BoolProperty(name, type, value);
+                return new BoolProperty(name, type, prop);
+
             case 'IntProperty\0':
-                length = this.readInt32();
                 let int1 = this.readInt32(); // floor
                 this.seek(1);
                 let int2 = this.readInt32();
-                value = [int1, int2]
-                return new IntProperty(name, type, value);
+                prop = [int1, int2]
+                return new IntProperty(name, type, prop);
+
             case 'FloatProperty\0':
-                this.seek(9);
-                value = this.readFloat();
-                return new FloatProperty(name, type, value);
+                this.seek(5);
+                prop = this.readFloat();
+                return new FloatProperty(name, type, prop);
+
             case 'StrProperty\0':
-                length = this.readInt32();
                 this.seek(5);
-                value = this.readString();
-                return new StrProperty(name, type, value);
+                prop = this.readString();
+                return new StrProperty(name, type, prop);
+
             case 'ObjectProperty\0':
-                length = this.readInt32();
                 this.seek(5);
-                value = this.readString();
-                return new ObjectProperty(name, type, value);
+                prop = this.readString();
+                return new ObjectProperty(name, type, prop);
+
             case 'SoftObjectProperty\0':
-                length = this.readInt32();
                 this.seek(5);
-                value = this.readString();
+                prop = this.readString();
                 this.seek(4);
-                return new SoftObjectProperty(name, type, value);
+                return new SoftObjectProperty(name, type, prop);
+
             case 'StructProperty\0':
-                length = this.readInt32();
                 this.seek(4);
                 let stype = this.readString();
                 this.seek(17);
-                let props = this.readProperties();
-                return new StructProperty(name, type, value, stype, props)
+                prop = this.readProperties();
+                return new StructProperty(name, type, prop, stype)
+
             case 'ArrayProperty\0':
-                let start = this.tell;
-                length = this.readInt32(); // stored struct size in bytes
+                // console.log(`Bytes to be Read: ${length}`)
                 this.seek(4);
                 let atype = this.readString();
                 this.seek(1);
-                // let start2 = this.tell;
                 let alength = this.readInt16();
                 this.seek(2);
-                let aname = this.readString();
-                let ptype = this.readString();
-                let toEnd = this.readInt32(); //length - ((this.tell - start2) + pname.length + 29)
-                this.seek(4);
-                let pname = this.readString();
-                this.seek(17);
-                value = [];
-                while(this.tell < (start + length)) {
-                    let propItem = this.readProperties();
-                    value.push(propItem);
-                }
-                return new ArrayProperty(name, type, value, atype, aname, ptype, pname);
+                // console.log(`StoredType: ${atype} Items in Array: ${alength}`)
+                prop = this.readArray(atype, alength);
+                return new ArrayProperty(name, type, prop, atype);
+
             case 'EnumProperty\0':
-                length = this.readInt32();
                 this.seek(4);
                 let etype = this.readString(); //same as type
                 this.seek(1);
-                value = this.readString();
-                return new EnumProperty(name, type, value, etype);
+                prop = this.readString();
+                return new EnumProperty(name, type, prop, etype);
+
             default:
-                throw new Error(`Unrecognized Property: ${type}`);
+                throw new Error(`Unrecognized Property '${type}' at offset 0x${(this.tell.toString(16))}`);
         }
+    }
+
+    readArray(atype, alength) {
+        // let start = this.tell;
+        let ret;
+        switch(atype)
+        {
+            case 'IntProperty\0':
+                this.seek((alength > 1) ? 8 : 4);
+                ret = this.readIntArray(alength);
+                // console.log(`Bytes Read: ${this.tell - start + 4}`);
+                return ret;
+            case 'SoftObjectProperty\0':
+                ret = this.readSoftObjectArray(alength);
+                // console.log(`Bytes Read: ${this.tell - start + 4}`);
+                return ret;
+            case 'StructProperty\0':
+                let struct = {};
+                struct.Name = this.readString();
+                struct.Type = this.readString();
+                this.readInt32(); // Struct Size
+                // console.log(`Struct Size: ${this.readInt32()}`);
+                this.seek(4);
+                struct.StoredPropertyType = this.readString();
+                this.seek(17);
+                struct.Property = this.readStructArray(alength);
+                // console.log(`Bytes Read: ${this.tell - start + 4}`);
+                return struct;
+            default:
+                throw new Error(`Unrecognized Property '${atype}' Reading Array at offset 0x${this.tell.toString(16)}`)
+        }
+    }
+    readIntArray(alength) {
+        let array = []
+        for(let i = 0; i < alength; i++) {
+            let int = {};
+            int.Name = this.readString();
+            int.Type = this.readString();
+            let start = this.tell;
+            this.readInt32(); // = 4
+            int.Property = []
+            let int1 = this.readInt32();
+            this.seek(1);
+            let int2 = (int.Type === 'IntProperty\0') ? this.readInt32() : this.readFloat();
+            int.Property = [int1, int2]
+            array.push(int);
+            // console.log(`Int Bytes Read: ${this.tell - start - 1}`)
+        }
+        return array;
+    }
+    readSoftObjectArray(alength) {
+        let array = [];
+        for(let i = 0; i < alength; i++) {
+            array.push(this.readString());
+            this.seek(4);
+        }
+        return array;
+    }
+    readStructArray(alength) {
+        let array = []
+        let start = this.tell;
+        for(let i = 0; i < alength; i++) {
+            array.push({Value:this.readProperties()});
+        }
+        // console.log(`Struct Bytes Read: ${this.tell - start}`)
+        return array;
     }
 }

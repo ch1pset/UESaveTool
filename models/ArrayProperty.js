@@ -1,40 +1,53 @@
-import {
-    Property,
-    BoolProperty,
-    IntProperty,
-    FloatProperty,
-    StrProperty,
-    ObjectProperty,
-    SoftObjectProperty,
-    StructProperty,
-    EnumProperty
-} from './index.js'
+import { Property } from './index.js'
 
 export class ArrayProperty extends Property {
-    constructor(name, type, value, atype, aname, ptype, pname) {
-        super(name, type, value);
-        this.ArrayType = atype;
-        this.ArrayName = aname;
-        this.ArrayPropertyType = ptype;
-        this.ArrayPropertyName = pname;
-        // this.Array = arr;
-        // this.StoredSize = length;
-        // console.log(`Generated Array Size: ${this.Size}`);
+    constructor(name, type, prop, stype) {
+        super(name, type, prop);
+        this.StoredPropertyType = stype;
     }
     get Size() {
         let size = 0;
-        size += 4;
-        size += this.ArrayName.length + 4;
-        size += this.ArrayPropertyType.length + 4;
-        size += 4;
-        size += 4;
-        size += this.ArrayPropertyName.length + 4;
-        size += 17;
-        for(let i = 0; i < this.Value.length; i++) {
-            for(let j = 0; j < this.Value[i].length; j++) {
-                size += this.Value[i][j].Size;
+        switch(this.StoredPropertyType)
+        {
+            case 'IntProperty\0':
+                size += 12; // 4 bit size, 4 bit int, 4 bit int
+                break;
+            case 'SoftObjectProperty\0':
+                for(let i = 0; i < this.Property.length; i++) {
+                    size += this.Property[i].length + 4;
+                    size += 4;
+                }
+                size += 4;
+                break;
+            case 'StructProperty\0':
+                size += 4;
+                size += this.Property.Name.length + 4;
+                size += this.Property.Type.length + 4;
+                size += 8;
+                size += this.Property.StoredPropertyType.length + 4;
+                size += 17;
+                let struct = this.Property;
+                for(let i = 0; i < struct.Property.length; i++) {
+                    for(let j = 0; j < struct.Property[i].Value.length; j++) {
+                        size += struct.Property[i].Value[j].Size;
+                    }
+                    size += 9; // 4 bit padding + 5 bit string: 'None\0'
+                }
+                break;
+        }
+        return size;
+    }
+    get StructSize() {
+        if(this.StoredPropertyType !== 'StructProperty\0')
+            throw new Error(`Property 'StructSize' is undefined`)
+
+        let size = 0;
+        let struct = this.Property;
+        for(let i = 0; i < struct.Property.length; i++) {
+            for(let j = 0; j < struct.Property[i].Value.length; j++) {
+                size += struct.Property[i].Value[j].Size;
             }
-            size += 9;
+            size += 9; // 4 bit padding + 5 bit string: 'None\0'
         }
         return size;
     }
@@ -42,44 +55,8 @@ export class ArrayProperty extends Property {
         let array = new ArrayProperty();
         array.Name = obj.Name;
         array.Type = obj.Type;
-        array.ArrayType = obj.ArrayType;
-        array.ArrayName = obj.ArrayName;
-        array.ArrayPropertyType = obj.ArrayPropertyType;
-        array.ArrayPropertyName = obj.ArrayPropertyName;
-        // array.StoredSize = obj.StoredSize;
-        array.Value = [];
-        obj.Value.forEach((arr) => {
-            let pair = [];
-            arr.forEach((prop) => {
-                switch(prop.Type)
-                {
-                    case 'BoolProperty\0':
-                        pair.push(BoolProperty.from(prop));
-                        break;
-                    case 'IntProperty\0':
-                        pair.push(IntProperty.from(prop));
-                        break;
-                    case 'FloatProperty\0':
-                        pair.push(FloatProperty.from(prop));
-                        break;
-                    case 'StrProperty\0':
-                        pair.push(StrProperty.from(prop));
-                        break;
-                    case 'ObjectProperty\0':
-                        pair.push(ObjectProperty.from(prop));
-                        break;
-                    case 'SoftObjectProperty\0':
-                        pair.push(SoftObjectProperty.from(prop));
-                        break;
-                    case 'EnumProperty\0':
-                        pair.push(EnumProperty.from(prop));
-                        break;
-                    default:
-                        throw new Error(`Unrecognized Property: ${prop.Type}`);
-                }
-            })
-            array.Value.push(pair);
-        })
+        array.StoredPropertyType = obj.StoredPropertyType;
+        array.Property = obj.Property;
         return array;
     }
 }
