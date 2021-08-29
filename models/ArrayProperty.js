@@ -37,12 +37,26 @@ export class ArrayProperty extends Property {
         }
         return size;
     }
+    get StructSize() {
+        if(this.StoredPropertyType !== 'StructProperty\0')
+            throw new Error(`Property 'StructSize' is undefined`)
+
+        let size = 0;
+        let struct = this.Property;
+        for(let i = 0; i < struct.Property.length; i++) {
+            for(let j = 0; j < struct.Property[i].Value.length; j++) {
+                size += struct.Property[i].Value[j].Size;
+            }
+            size += 9; // 4 bit padding + 5 bit string: 'None\0'
+        }
+        return size;
+    }
     static from(obj) {
         let array = new ArrayProperty();
         array.Name = obj.Name;
         array.Type = obj.Type;
         array.StoredPropertyType = obj.StoredPropertyType;
-        array.prop = obj.Property;
+        array.Property = obj.Property;
         return array;
     }
 }
