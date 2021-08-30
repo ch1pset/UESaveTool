@@ -7,6 +7,11 @@ export class StructArray extends Property {
     }
     get Size() {
         let size = 0;
+        size += this.Name.length + 4;
+        size += this.Type.length + 4;
+        size += 4;
+        size += this.StoredPropertyType.length + 4;
+        size += 17;
         for(let i = 0; i < this.Property.length; i++) {
             size += this.Property[i].Size;
             size += 9; // 4 bit padding + 5 bit string: 'None\0'

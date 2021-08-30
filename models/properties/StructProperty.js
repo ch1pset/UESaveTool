@@ -7,17 +7,33 @@ export class StructProperty extends Property {
         this.StoredPropertyType = stype;
     }
     get Size() {
-        let size = 0;
-        // size += this.StoredPropertyType.length + 4;
+        let size = 9;
+        size += this.Name.length + 4;
+        size += this.Type.length + 4;
+        size += 8;
+        size += this.StoredPropertyType.length + 4;
+        size += 17;
+        // console.log(this);
         for(let i = 0; i < this.Property.length; i++) {
-            if(this.Property[i].Type === 'ArrayProperty\0') {
-                // console.log(this.Property[i].Size);
-                size += this.Property[i].Name.length + 4;
-                size += this.Property[i].Type.length + 4;
-                size += this.Property[i].StoredPropertyType.length + 4;
-                size += 9;
-            }
             size += this.Property[i].Size;
+            // size += 9;
+        }
+        return size;
+    }
+    get HeaderSize() {
+        let size = 4;
+        size += this.Name.length + 4;
+        size += this.Type.length + 4;
+        size += 8;
+        size += this.StoredPropertyType.length + 4;
+        size += 17;
+        return size
+    }
+    get PropertiesSize() {
+        let size = 0;
+        for(let i = 0; i < this.Property.length; i++) {
+            size += this.Property[i].Size;
+            // size += 9;
         }
         return size;
     }

@@ -7,7 +7,7 @@ export class IntArray extends Property {
         this.Properties = properties;
     }
     get Size() {
-        let size = this.Properties.length > 1 ? 8 : 4;
+        let size = 4;
         this.Properties.forEach((int) => {
             size += int.Size
         });
@@ -21,6 +21,8 @@ export class IntArray extends Property {
     }
     static from(obj) {
         let array = new IntArray([]);
-        obj.Properties.forEach(int => array.push(PropertyFactory.create(int)));
+        array.Properties = [];
+        obj.Properties.forEach(int => array.Properties.push(PropertyFactory.create(int)));
+        return array;
     }
 }

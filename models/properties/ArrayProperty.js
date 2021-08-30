@@ -8,21 +8,22 @@ export class ArrayProperty extends Property {
         this.StoredPropertyType = stype;
     }
     get Size() {
-        switch(this.StoredPropertyType)
-        {
-            case 'IntProperty\0':
-            case 'SoftObjectProperty\0':
-                return this.Property.Size;
-            case 'StructProperty\0':
-                let size = 4;
-                size += this.Property.Name.length + 4;
-                size += this.Property.Type.length + 4;
-                size += 8;
-                size += this.Property.StoredPropertyType.length + 4;
-                size += 17;
-                size += this.Property.Size;
-                return size;
-        }
+        let size = 4; 
+        size += this.Name.length + 4;
+        size += this.Type.length + 4;
+        size += 8;
+        size += this.StoredPropertyType.length + 4;
+        size += 5;
+        size += this.Property.Size;
+        return size;
+    }
+    get HeaderSize() {
+        let size = this.Name.length + 4;
+        size += this.Type.length + 4;
+        size += 4;
+        // size += this.StoredPropertyType.length + 4;
+        // size += 5;
+        return size;
     }
     serialize() {
         let buf = Buffer.alloc(this.Size);

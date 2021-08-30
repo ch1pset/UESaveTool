@@ -83,16 +83,19 @@ export class Reader extends FileIO {
         let data = [];
         let next;
         while((next = this.readString()) !== 'None\0') {
+            let start = this.tell;
             let type = this.readString();
             let length = this.readInt32();
             let prop = this.readProperty(next, type, length)
-            // if(type === 'ArrayProperty\0') {
+            if(type === 'ArrayProperty\0' || type === 'StructProperty\0') {
+                console.log(`Property: ${prop.Name} Bytes Read: ${this.tell - start + next.length + 4}`)
+                // console.log(`Property: ${prop.Name} Bytes Read: ${this.tell - start}`)
             //     console.log(prop.Property.Property);
             // //     console.log(`Array Calculated Sizes: ${prop.Size}`);
             // //     if(prop.StoredPropertyType === 'StructProperty\0')
             // //         console.log(`Calculated Struct Size: ${prop.StructSize}`);
             //     // console.log();
-            // }
+            }
             data.push(prop);
         }
         return data;
@@ -104,7 +107,7 @@ export class Reader extends FileIO {
         switch(type)
         {
             case 'BoolProperty\0':
-                console.log(`Bool length: ${length}`);
+                // console.log(`Bool length: ${length}`);
                 this.seek(4);
                 prop = this.readByte() === 1;
                 this.seek(1);
@@ -145,9 +148,10 @@ export class Reader extends FileIO {
                 this.seek(17);
                 let start = this.tell;
                 prop = this.readProperties();
-                // console.log(`Struct Size: ${this.tell - start}`);
                 let struct = new StructProperty(name, type, prop, stype)
-                console.log(`Calculated Struct Size: ${struct.Size}`)
+                // console.log(`Struct Size: ${this.tell - start}`);
+                console.log(`Calculated Struct Size: ${struct.Size}`);
+                // console.log(`Calculated Struct Size: ${struct.PropertiesSize}`)
                 console.log();
                 return struct;
 
@@ -159,12 +163,11 @@ export class Reader extends FileIO {
                 this.seek(1);
                 let alength = this.readInt16();
                 this.seek(2);
-                // console.log(`StoredType: ${atype} Items in Array: ${alength}`)
                 prop = this.readArray(atype, alength);
                 let arr = new ArrayProperty(name, type, prop, atype);
                 // console.log(arr);
                 // console.log(`Calculated Size: ${arr.Size}`);
-                // console.log(`Calculated Array Size: ${arr.Size}\n`)
+                // console.log(`Calculated Array Size: ${arr.Size - arr.HeaderSize}\n`)
                 // console.log();
                 return arr;
 
@@ -188,24 +191,24 @@ export class Reader extends FileIO {
             case 'IntProperty\0':
                 this.seek((alength > 1) ? 8 : 4);
                 ret = this.readIntArray(alength);
-                console.log(`Bytes Read: ${this.tell - start}`);
+                // console.log(`Bytes Read: ${this.tell - start}`);
                 return ret;
             case 'SoftObjectProperty\0':
                 ret = this.readSoftObjectArray(alength);
-                console.log(`Bytes Read: ${this.tell - start + 4}`);
+                // console.log(`Bytes Read: ${this.tell - start + 4}`);
                 return ret;
             case 'StructProperty\0':
                 let name = this.readString();
                 let type = this.readString();
-                // this.readInt32(); // Struct Size
-                console.log(`Struct Array Size: ${this.readInt32()}`);
+                this.readInt32(); // Struct Size
+                // console.log(`Struct Array Size: ${this.readInt32()}`);
                 this.seek(4);
                 let stype = this.readString();
                 this.seek(17);
                 let prop = this.readStructArray(stype, alength);
-                console.log(`Bytes Read: ${this.tell - start + 4}`);
+                // console.log(`Bytes Read: ${this.tell - start + 4}`);
                 ret = new StructArray(name, type, prop, stype);
-                console.log(`Calculated Struct Array Size: ${ret.Size}`);
+                // console.log(`Calculated Struct Array Size: ${ret.Size}`);
                 return ret;
             default:
                 throw new Error(`Unrecognized Property '${atype}' Reading Array at offset 0x${this.tell.toString(16)}`)
