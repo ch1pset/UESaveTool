@@ -1,7 +1,9 @@
 import { Buffer } from 'buffer'
+import { Property } from './index.js'
 
-export class Guid {
+export class Guid extends Property {
     constructor(id, guid) {
+        super();
         this.Id = id;
         this.Value = guid;
     }
