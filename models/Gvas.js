@@ -1,15 +1,5 @@
 import * as fs from 'fs';
-import { 
-    BoolProperty,
-    IntProperty,
-    FloatProperty,
-    StrProperty,
-    ObjectProperty,
-    SoftObjectProperty,
-    StructProperty,
-    ArrayProperty,
-    EnumProperty
-} from './properties/index.js';
+import { PropertyFactory } from './factories/index.js';
 
 export class Gvas {
     constructor()
@@ -42,40 +32,7 @@ export class Gvas {
         gvas.CustomFormatData = json.CustomFormatData;
         gvas.SaveGameType = json.SaveGameType;
         gvas.Properties = [];
-        json.Properties.forEach((prop) => {
-            switch(prop.Type)
-            {
-                case 'BoolProperty\0':
-                    gvas.Properties.push(BoolProperty.from(prop));
-                    break;
-                case 'IntProperty\0':
-                    gvas.Properties.push(IntProperty.from(prop));
-                    break;
-                case 'FloatProperty\0':
-                    gvas.Properties.push(FloatProperty.from(prop));
-                    break;
-                case 'StrProperty\0':
-                    gvas.Properties.push(StrProperty.from(prop));
-                    break;
-                case 'ObjectProperty\0':
-                    gvas.Properties.push(ObjectProperty.from(prop));
-                    break;
-                case 'SoftObjectProperty\0':
-                    gvas.Properties.push(SoftObjectProperty.from(prop));
-                    break;
-                case 'StructProperty\0':
-                    gvas.Properties.push(StructProperty.from(prop));
-                    break;
-                case 'ArrayProperty\0':
-                    gvas.Properties.push(ArrayProperty.from(prop));
-                    break;
-                case 'EnumProperty\0':
-                    gvas.Properties.push(EnumProperty.from(prop));
-                    break;
-                default:
-                    throw new Error(`Unrecognized Property '${prop.Type}' Generating Gvas`);
-            }
-        })
+        json.Properties.forEach((prop) => gvas.Properties.push(PropertyFactory.create(prop)));
         return gvas;
     }
 }
