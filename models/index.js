@@ -10,3 +10,4 @@ export { StructProperty } from './StructProperty.js';
 export { ArrayProperty } from './ArrayProperty.js';
 export { EnumProperty } from './EnumProperty.js';
 export { TupleProperty } from './TupleProperty.js';
+export { Guid } from './Guid.js'
