@@ -2,7 +2,7 @@ import * as fs from 'fs';
 import { Buffer } from 'buffer';
 import { Gvas } from './models/index.js';
 import { Reader } from './utils/index.js';
-import { Guid } from './models/index.js';
+import { Guid } from './models/properties/index.js';
 
 function UEDeserializer()
 {

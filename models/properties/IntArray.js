@@ -1,8 +1,5 @@
-import { 
-    Property,
-    IntProperty,
-    FloatProperty
-} from './index.js'
+import { Property } from './index.js'
+import { PropertyFactory } from '../factories/index.js'
 
 export class IntArray extends Property {
     constructor(properties) {
@@ -24,16 +21,6 @@ export class IntArray extends Property {
     }
     static from(obj) {
         let array = new IntArray([]);
-        obj.Properties.forEach(int => {
-            switch(int.Type)
-            {
-                case 'IntProperty\0':
-                    array.Properties.push(IntProperty.from(int));
-                    break;
-                case 'FloatProperty\0':
-                    array.Properties.push(FloatProperty.from(int));
-                    break;
-            }
-        });
+        obj.Properties.forEach(int => array.push(PropertyFactory.create(int)));
     }
 }

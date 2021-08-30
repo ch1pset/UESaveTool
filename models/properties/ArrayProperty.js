@@ -1,10 +1,6 @@
 import { Buffer } from 'buffer'
-import { 
-    Property,
-    IntArray,
-    SoftObjectArray,
-    StructArray
-} from './index.js'
+import { Property } from './index.js'
+import { ArrayFactory } from '../factories/index.js';
 
 export class ArrayProperty extends Property {
     constructor(name, type, prop, stype) {
@@ -51,17 +47,7 @@ export class ArrayProperty extends Property {
         array.Name = obj.Name;
         array.Type = obj.Type;
         array.StoredPropertyType = obj.StoredPropertyType;
-        array.Property = () => {
-            switch(obj.StoredPropertyType)
-            {
-                case 'IntProperty':
-                    return IntArray.from(obj.Property);
-                case 'SoftObjectProperty':
-                    return SoftObjectArray.from(obj.Property);
-                case 'StructProperty':
-                    return StructArray.from(obj.Property);
-            }
-        }
+        array.Property = ArrayFactory.create(obj);
         return array;
     }
 }

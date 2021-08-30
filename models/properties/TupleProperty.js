@@ -1,11 +1,7 @@
-import { 
-    Property,
-    FloatProperty,
-    SoftObjectProperty,
-} from './index.js'
-import { PropertyFactory } from './PropertyFactory.js';
+import { Property } from './index.js'
+import { PropertyFactory } from '../factories/index.js';
 
-export class TupleProperty extends Property{
+export class TupleProperty extends Property {
     constructor(props) {
         super();
         this.Properties = props;

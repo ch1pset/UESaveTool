@@ -9,7 +9,7 @@ import {
     StructProperty,
     ArrayProperty,
     EnumProperty
-} from './index.js';
+} from './properties/index.js';
 
 export class Gvas {
     constructor()

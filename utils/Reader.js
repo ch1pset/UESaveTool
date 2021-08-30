@@ -1,6 +1,5 @@
 import { FileIO, dword, word, byte } from './index.js'
 import {
-    PropertyFactory,
     BoolProperty,
     IntProperty,
     FloatProperty,
@@ -14,7 +13,8 @@ import {
     IntArray,
     SoftObjectArray,
     StructArray
-} from '../models/index.js'
+} from '../models/properties/index.js'
+import { PropertyFactory } from '../models/factories/index.js'
 
 export class Reader extends FileIO {
     constructor() {
