@@ -3,43 +3,26 @@ import {
     FloatProperty,
     SoftObjectProperty,
 } from './index.js'
+import { PropertyFactory } from './PropertyFactory.js';
 
 export class TupleProperty extends Property{
-    /**
-     * 
-     * @param {String} name 
-     * @param {Array} props 
-     */
-    constructor(name, props) {
-        super(name);
+    constructor(props) {
+        super();
         this.Properties = props;
     }
     get Size() {
-        // return this.Properties.reduce((acc, cur) => acc.Size + cur.Size);
-        let size = 0;
-        this.Properties.forEach((prop) => {
-            size += prop.Size;
-        });
-        return size;
+        return this.Properties.reduce((acc, cur) => acc.Size + cur.Size);
     }
     serialize() {
-        let buf = Buffer.alloc(this.Size);
-        
+        let buf = [];
+        for(let i = 0; i < this.Properties.length; i++) {
+            buf.push(this.Properties[i].serialize());
+        }
+        return Buffer.concat(buf);
     }
     static from(obj) {
-        let tuple = new TupleProperty(null, []);
-        tuple.Name = obj.Name;
-        for(let i = 0; i < obj.Properties.length; i++) {
-            switch(obj.Properties[i].Type)
-            {
-                case 'SoftObjectProperty\0':
-                    tuple.Properties.push(SoftObjectProperty.from(obj.Properties[i]));
-                    break;
-                case 'FloatProperty\0':
-                    tuple.Properties.push(FloatProperty.from(obj.Properties[i]));
-                    break;
-            }
-        }
+        let tuple = new TupleProperty([]);
+        obj.Properties.forEach(prop => tuple.Properties.push(PropertyFactory.create(prop)));
         return tuple;
     }
 }

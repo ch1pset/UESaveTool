@@ -11,3 +11,7 @@ export { ArrayProperty } from './ArrayProperty.js';
 export { EnumProperty } from './EnumProperty.js';
 export { TupleProperty } from './TupleProperty.js';
 export { Guid } from './Guid.js'
+export { IntArray } from './IntArray.js'
+export { SoftObjectArray } from './SoftObjectArray.js'
+export { StructArray } from './StructArray.js'
+export { PropertyFactory } from './PropertyFactory.js'

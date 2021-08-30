@@ -1,5 +1,6 @@
 import { FileIO, dword, word, byte } from './index.js'
 import {
+    PropertyFactory,
     BoolProperty,
     IntProperty,
     FloatProperty,
@@ -9,7 +10,10 @@ import {
     StructProperty,
     ArrayProperty,
     EnumProperty,
-    TupleProperty
+    TupleProperty,
+    IntArray,
+    SoftObjectArray,
+    StructArray
 } from '../models/index.js'
 
 export class Reader extends FileIO {
@@ -135,7 +139,7 @@ export class Reader extends FileIO {
                 return new SoftObjectProperty(name, type, prop);
 
             case 'StructProperty\0':
-                console.log(`Name: ${name} Type: ${type} Size: ${length}`)
+                // console.log(`Name: ${name} Type: ${type} Size: ${length}`)
                 this.seek(4);
                 let stype = this.readString();
                 this.seek(17);
@@ -184,25 +188,25 @@ export class Reader extends FileIO {
             case 'IntProperty\0':
                 this.seek((alength > 1) ? 8 : 4);
                 ret = this.readIntArray(alength);
-                // console.log(`Bytes Read: ${this.tell - start}`);
+                console.log(`Bytes Read: ${this.tell - start}`);
                 return ret;
             case 'SoftObjectProperty\0':
                 ret = this.readSoftObjectArray(alength);
-                // console.log(`Bytes Read: ${this.tell - start + 4}`);
+                console.log(`Bytes Read: ${this.tell - start + 4}`);
                 return ret;
             case 'StructProperty\0':
-                let struct = {};
-                struct.Name = this.readString();
-                struct.Type = this.readString();
-                this.readInt32(); // Struct Size
-                // console.log(`Struct Size: ${this.readInt32()}`);
+                let name = this.readString();
+                let type = this.readString();
+                // this.readInt32(); // Struct Size
+                console.log(`Struct Array Size: ${this.readInt32()}`);
                 this.seek(4);
-                struct.StoredPropertyType = this.readString();
+                let stype = this.readString();
                 this.seek(17);
-                struct.Property = this.readStructArray(struct.StoredPropertyType, alength);
-                // console.log(`Bytes Read: ${this.tell - start + 4}`);
-
-                return struct;
+                let prop = this.readStructArray(stype, alength);
+                console.log(`Bytes Read: ${this.tell - start + 4}`);
+                ret = new StructArray(name, type, prop, stype);
+                console.log(`Calculated Struct Array Size: ${ret.Size}`);
+                return ret;
             default:
                 throw new Error(`Unrecognized Property '${atype}' Reading Array at offset 0x${this.tell.toString(16)}`)
         }
@@ -215,15 +219,15 @@ export class Reader extends FileIO {
             int.Type = this.readString();
             let start = this.tell;
             this.readInt32(); // = 4
-            int.Property = []
             let int1 = this.readInt32();
             this.seek(1);
             let int2 = (int.Type === 'IntProperty\0') ? this.readInt32() : this.readFloat();
-            int.Property = [int1, int2]
-            array.push(int);
+            int.Property = [int1, int2];
+            array.push(PropertyFactory.create(int));
             // console.log(`Int Bytes Read: ${this.tell - start - 1}`)
         }
-        return array;
+        let arr = new IntArray(array);
+        return arr;
     }
     readSoftObjectArray(alength) {
         let array = [];
@@ -231,13 +235,13 @@ export class Reader extends FileIO {
             array.push(this.readString());
             this.seek(4);
         }
-        return array;
+        return new SoftObjectArray(array);
     }
     readStructArray(name, alength) {
         let array = []
         let start = this.tell;
         for(let i = 0; i < alength; i++) {
-            array.push(new TupleProperty(name, this.readProperties()));
+            array.push(new TupleProperty(this.readProperties()));
         }
         // console.log(array)
         // console.log(`Struct Bytes Read: ${this.tell - start}`)
