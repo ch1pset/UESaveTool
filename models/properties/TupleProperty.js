@@ -5,6 +5,7 @@ import { SerializationError } from '../index.js';
 export class TupleProperty extends Property {
     constructor(props) {
         super();
+        this.Type = 'Tuple';
         this.Properties = props;
     }
     get Size() {

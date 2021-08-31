@@ -5,6 +5,7 @@ import { SerializationError } from '../index.js';
 export class Guid extends Property {
     constructor(id, guid) {
         super();
+        this.Type = 'Guid';
         this.Id = id;
         this.Value = guid;
     }

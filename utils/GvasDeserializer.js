@@ -22,7 +22,7 @@ export class GvasDesesrializer extends BufferReader {
         Id += `-${this.read(2).toString('hex')}`
         Id += `-${this.read(6).toString('hex')}`
         let Value = this.readInt32();
-        return new Guid(Id, Value);
+        return PropertyFactory.create({Id, Value, Type:'Guid'});
     }
     readProperties() {
         let data = [];
@@ -130,7 +130,11 @@ export class GvasDesesrializer extends BufferReader {
                 this.seek(17);
                 array.Property = []
                 for(let i = 0; i < count; i++) {
-                    array.Property.push(new TupleProperty(this.readProperties()));
+                    let props = {
+                        Type:'Tuple',
+                        Properties:this.readProperties()
+                    }
+                    array.Property.push(PropertyFactory.create(props));
                 }
                 break;
             default:
