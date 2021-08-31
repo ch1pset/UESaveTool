@@ -1,7 +1,7 @@
 import {
     IntArray,
     SoftObjectArray,
-    StructArray
+    StructProperty
 } from '../properties/index.js'
 import { TypeNotImplementedError } from '../index.js';
 
@@ -14,7 +14,7 @@ export class ArrayFactory {
             case 'SoftObjectProperty\0':
                 return SoftObjectArray.from(obj.Property);
             case 'StructProperty\0':
-                return StructArray.from(obj.Property);
+                return StructProperty.from(obj.Property);
             default:
                 throw TypeNotImplementedError(obj.Type);
         }

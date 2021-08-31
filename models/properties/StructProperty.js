@@ -15,7 +15,6 @@ export class StructProperty extends Property {
         for(let i = 0; i < this.Property.length; i++) {
             size += this.Property[i].Size;
         }
-        size += 9; // 4 byte size + 5 byte string: 'None\0'
         return size;
     }
     get HeaderSize() {
@@ -25,6 +24,9 @@ export class StructProperty extends Property {
         size += this.StoredPropertyType.length + 4;
         size += 17;
         return size
+    }
+    get Count() {
+        return this.Property.length;
     }
     serialize() {
         let buf = Buffer.alloc(this.Size);
@@ -41,8 +43,8 @@ export class StructProperty extends Property {
         for(let i = 0; i < this.Property.length; i++) {
             offset += this.Property[i].serialize().copy(buf, offset);
         }
-        offset = buf.writeInt32LE(5, offset);
-        offset += buf.write('None\0', offset);
+        // offset = buf.writeInt32LE(5, offset);
+        // offset += buf.write('None\0', offset);
         if(buf.length !== this.Size)
             throw new SerializationError(this);
         return buf;

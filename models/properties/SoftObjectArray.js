@@ -13,7 +13,7 @@ export class SoftObjectArray extends Property {
         });
         return size;
     }
-    get Length() {
+    get Count() {
         return this.Properties.length;
     }
     serialize() {
