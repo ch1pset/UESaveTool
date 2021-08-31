@@ -3,6 +3,7 @@ import {
     SoftObjectArray,
     StructArray
 } from '../properties/index.js'
+import { TypeNotImplementedError } from '../index.js';
 
 export class ArrayFactory {
     static create(obj) {
@@ -14,6 +15,8 @@ export class ArrayFactory {
                 return SoftObjectArray.from(obj.Property);
             case 'StructProperty\0':
                 return StructArray.from(obj.Property);
+            default:
+                throw TypeNotImplementedError(obj.Type);
         }
     }
 }
