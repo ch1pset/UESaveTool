@@ -1,6 +1,5 @@
 import { PropertyFactory } from '../models/factories/index.js'
 import { DeserializationError, Gvas } from '../models/index.js';
-import { TupleProperty, Guid } from '../models/properties/index.js';
 import { BufferReader } from './BufferReader.js';
 
 export class GvasDesesrializer extends BufferReader {
