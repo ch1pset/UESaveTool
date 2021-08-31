@@ -23,7 +23,6 @@ export class IntArray extends Property {
         this.Properties.forEach(int => offset += int.serialize().copy(buf, offset));
         if(buf.length !== this.Size)
             throw new SerializationError(this);
-        console.log(`Successfully serialized ${IntArray.name}`);
         return buf;
     }
     static from(obj) {

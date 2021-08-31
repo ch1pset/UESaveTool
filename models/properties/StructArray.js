@@ -43,10 +43,8 @@ export class StructArray extends Property {
         for(let i = 0; i < this.Property.length; i++) {
             offset += this.Property[i].serialize().copy(buf, offset);
         }
-        console.log(`Expected size: ${this.Size} Actual Size: ${offset}`)
         if(offset !== this.Size)
             throw new SerializationError(this);
-        console.log(`Successfully serialized ${StructArray.name}`)
         return buf;
     }
     static from(obj) {

@@ -26,7 +26,6 @@ export class SoftObjectArray extends Property {
         });
         if(offset !== this.Size)
             throw new SerializationError(this);
-        console.log(`Successfully serialized ${SoftObjectArray.name}`);
         return buf;
     }
     static from(obj) {
