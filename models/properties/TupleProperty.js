@@ -5,10 +5,20 @@ import { SerializationError } from '../index.js';
 export class TupleProperty extends Property {
     constructor(props) {
         super();
+        this.Type = 'Tuple';
         this.Properties = props;
     }
     get Size() {
-        return this.Properties.reduce((acc, cur) => acc.Size + cur.Size) + 9;
+        let size = 0;
+        for(let i = 0; i < this.Properties.length; i++) {
+            size += this.Properties[i].Size;
+        }
+        size += 9;
+        return size;
+    }
+    get Count() {
+        console.log(this.Properties.length);
+        return this.Properties.length;
     }
     serialize() {
         let buf = Buffer.alloc(this.Size);

@@ -44,7 +44,7 @@ export class ArrayProperty extends Property {
         offset = buf.writeInt32LE(this.StoredPropertyType.length, offset);
         offset += buf.write(this.StoredPropertyType, offset);
         offset += 1;
-        offset = buf.writeInt16LE(this.Property.Length, offset);
+        offset = buf.writeInt16LE(this.Property.Count, offset);
         offset += 2;
         offset += this.Property.serialize().copy(buf, offset);
         if(buf.length !== this.Size)

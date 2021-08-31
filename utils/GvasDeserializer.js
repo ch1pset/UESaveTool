@@ -1,6 +1,5 @@
 import { PropertyFactory } from '../models/factories/index.js'
 import { DeserializationError, Gvas } from '../models/index.js';
-import { TupleProperty, Guid } from '../models/properties/index.js';
 import { BufferReader } from './BufferReader.js';
 
 export class GvasDesesrializer extends BufferReader {
@@ -22,7 +21,7 @@ export class GvasDesesrializer extends BufferReader {
         Id += `-${this.read(2).toString('hex')}`
         Id += `-${this.read(6).toString('hex')}`
         let Value = this.readInt32();
-        return new Guid(Id, Value);
+        return PropertyFactory.create({Id, Value, Type:'Guid'});
     }
     readProperties() {
         let data = [];
@@ -30,12 +29,12 @@ export class GvasDesesrializer extends BufferReader {
         while((next = this.readString()) !== 'None\0') {
             let type = this.readString();
             let length = this.readInt32();
-            let property = this.readProperty(next, type, length);
+            let property = this.readProperty(next, type);
             data.push(property);
         }
         return data;
     }
-    readProperty(name, type) {
+    readProperty(name, type, length) {
         let prop = {};
         prop.Name = name;
         prop.Type = type;
@@ -76,7 +75,16 @@ export class GvasDesesrializer extends BufferReader {
                 this.seek(4);
                 prop.StoredPropertyType = this.readString();
                 this.seek(17);
-                prop.Property = this.readProperties();
+                prop.Property = []
+                let i = 0;
+                while(length ? i < length : i < 1) {
+                    let props = {
+                        Type:'Tuple',
+                        Properties:this.readProperties()
+                    }
+                    prop.Property.push(PropertyFactory.create(props));
+                    i++;
+                }
                 break;
 
             case 'ArrayProperty':
@@ -112,7 +120,6 @@ export class GvasDesesrializer extends BufferReader {
                     let length = this.readInt32();
                     array.Properties.push(this.readProperty(name, type, length));
                 }
-                // console.log(array);
                 break;
             case 'SoftObjectProperty':
                 array.Properties = []
@@ -122,21 +129,14 @@ export class GvasDesesrializer extends BufferReader {
                 }
                 break;
             case 'StructProperty':
-                array.Name = this.readString();
-                array.Type = this.readString();
+                let name = this.readString();
+                let type = this.readString();
                 this.readInt32();
-                this.seek(4);
-                array.StoredPropertyType = this.readString();
-                this.seek(17);
-                array.Property = []
-                for(let i = 0; i < count; i++) {
-                    array.Property.push(new TupleProperty(this.readProperties()));
-                }
+                array = this.readProperty(name, type, count);
                 break;
             default:
                 throw new DeserializationError(storedType, this.tell - storedType.length - 9);
         }
-        // console.log(array);
         return array;
     }
 }
