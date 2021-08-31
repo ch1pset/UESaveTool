@@ -1,6 +1,5 @@
 import * as fs from 'fs';
 import { Gvas } from './models/index.js';
-import { FileIO } from './utils/index.js';
 
 function UESerializer() 
 {
