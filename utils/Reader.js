@@ -88,7 +88,7 @@ export class Reader extends FileIO {
             let length = this.readInt32();
             let prop = this.readProperty(next, type, length)
             if(type === 'ArrayProperty\0' || type === 'StructProperty\0') {
-                console.log(`Property: ${prop.Name} Bytes Read: ${this.tell - start + next.length + 4}`)
+                console.log(`Property: ${prop.Name}\n\tBytes Read: ${this.tell - start + next.length + 4}\n\tCalculated Size: ${prop.Size}`)
                 // console.log(`Property: ${prop.Name} Bytes Read: ${this.tell - start}`)
             //     console.log(prop.Property.Property);
             // //     console.log(`Array Calculated Sizes: ${prop.Size}`);
@@ -102,7 +102,7 @@ export class Reader extends FileIO {
     }
 
     readProperty(name, type, length) {
-        let prop;
+        let prop, start;
         // console.log(`Name: ${name} Type: ${type} Size: ${length}`)
         switch(type)
         {
@@ -146,18 +146,18 @@ export class Reader extends FileIO {
                 this.seek(4);
                 let stype = this.readString();
                 this.seek(17);
-                let start = this.tell;
+                start = this.tell;
                 prop = this.readProperties();
                 let struct = new StructProperty(name, type, prop, stype)
-                // console.log(`Struct Size: ${this.tell - start}`);
-                console.log(`Calculated Struct Size: ${struct.Size}`);
+                // console.log(`Given Size: ${length} Struct Size: ${this.tell - start}`);
+                // console.log(`Calculated Struct Size: ${struct.Size - struct.HeaderSize}`);
                 // console.log(`Calculated Struct Size: ${struct.PropertiesSize}`)
                 console.log();
                 return struct;
 
             case 'ArrayProperty\0':
-                // console.log(`Bytes to be Read: ${length}`)
-                // console.log(`Name: ${name} Type: ${type} Size: ${length}`)
+                console.log(`\tName: ${name} Type: ${type} Size: ${length}`)
+                start = this.tell;
                 this.seek(4);
                 let atype = this.readString();
                 this.seek(1);
@@ -165,8 +165,8 @@ export class Reader extends FileIO {
                 this.seek(2);
                 prop = this.readArray(atype, alength);
                 let arr = new ArrayProperty(name, type, prop, atype);
-                // console.log(arr);
-                // console.log(`Calculated Size: ${arr.Size}`);
+                // console.log(`\t\tBytes Read: ${this.tell - start}`);
+                console.log(`\t\tCalculated Size: ${arr.Size - arr.HeaderSize}`);
                 // console.log(`Calculated Array Size: ${arr.Size - arr.HeaderSize}\n`)
                 // console.log();
                 return arr;
@@ -201,14 +201,15 @@ export class Reader extends FileIO {
                 let name = this.readString();
                 let type = this.readString();
                 this.readInt32(); // Struct Size
-                // console.log(`Struct Array Size: ${this.readInt32()}`);
+                // console.log(`\t\tGiven Struct Array Size: ${this.readInt32()}`);
                 this.seek(4);
                 let stype = this.readString();
                 this.seek(17);
+                // start = this.tell;
                 let prop = this.readStructArray(stype, alength);
-                // console.log(`Bytes Read: ${this.tell - start + 4}`);
+                // console.log(`\t\tBytes Read: ${this.tell - start}`);
                 ret = new StructArray(name, type, prop, stype);
-                // console.log(`Calculated Struct Array Size: ${ret.Size}`);
+                // console.log(`\t\tCalculated Struct Array Size: ${ret.Size - ret.HeaderSize - 4}`);
                 return ret;
             default:
                 throw new Error(`Unrecognized Property '${atype}' Reading Array at offset 0x${this.tell.toString(16)}`)
@@ -217,17 +218,10 @@ export class Reader extends FileIO {
     readIntArray(alength) {
         let array = []
         for(let i = 0; i < alength; i++) {
-            let int = {};
-            int.Name = this.readString();
-            int.Type = this.readString();
-            let start = this.tell;
-            this.readInt32(); // = 4
-            let int1 = this.readInt32();
-            this.seek(1);
-            let int2 = (int.Type === 'IntProperty\0') ? this.readInt32() : this.readFloat();
-            int.Property = [int1, int2];
-            array.push(PropertyFactory.create(int));
-            // console.log(`Int Bytes Read: ${this.tell - start - 1}`)
+            let name = this.readString();
+            let type = this.readString();
+            let length = this.readInt32();
+            array.push(this.readProperty(name, type, length))
         }
         let arr = new IntArray(array);
         return arr;
@@ -246,8 +240,6 @@ export class Reader extends FileIO {
         for(let i = 0; i < alength; i++) {
             array.push(new TupleProperty(this.readProperties()));
         }
-        // console.log(array)
-        // console.log(`Struct Bytes Read: ${this.tell - start}`)
         return array;
     }
 }
