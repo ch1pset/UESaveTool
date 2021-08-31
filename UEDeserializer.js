@@ -1,6 +1,5 @@
 import * as fs from 'fs';
 import { Gvas } from './models/index.js';
-import { GvasDesesrializer } from './utils/index.js';
 
 function UEDeserializer()
 {
@@ -9,7 +8,7 @@ function UEDeserializer()
 
         const gvas = new Gvas();
         try {
-            gvas.deserialize(new GvasDesesrializer(buf));
+            gvas.deserialize(buf);
             fs.writeFile('./output.json', JSON.stringify(gvas, null, 2), (err) => {
                 if(err) throw err;
             });

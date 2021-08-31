@@ -1,6 +1,7 @@
 import { PropertyFactory } from './factories/index.js';
 import { Guid } from './properties/index.js';
 import { SerializationError } from './PropertyErrors.js';
+import { GvasDesesrializer } from '../utils/index.js';
 
 export class Gvas {
     constructor()
@@ -38,7 +39,8 @@ export class Gvas {
         size += 13; // 4 byte size + 5 byte string 'None\0' + 4 byte padding
         return size;
     }
-    deserialize(sav) {
+    deserialize(buf) {
+        let sav = new GvasDesesrializer(buf);
         let header = sav.read(4);
         if(Buffer.compare(Buffer.from('GVAS'), header) !== 0)
             throw Error(`Unexpected header, expected 'GVAS`)
