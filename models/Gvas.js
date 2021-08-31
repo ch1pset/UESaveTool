@@ -1,4 +1,3 @@
-import * as fs from 'fs';
 import { PropertyFactory } from './factories/index.js';
 
 export class Gvas {
@@ -22,17 +21,16 @@ export class Gvas {
         this.SaveGameType = "";
         this.Properties = [];
     }
-    static fromFile(path) {
+    static from(obj) {
         let gvas = new Gvas();
-        let json = JSON.parse(fs.readFileSync(path, 'utf8'));
-        gvas.SaveGameVersion = json.SaveGameVersion;
-        gvas.PackageVersion = json.PackageVersion;
-        gvas.EngineVersion = json.EngineVersion;
-        gvas.CustomFormatVersion = json.CustomFormatVersion;
-        gvas.CustomFormatData = json.CustomFormatData;
-        gvas.SaveGameType = json.SaveGameType;
+        gvas.SaveGameVersion = obj.SaveGameVersion;
+        gvas.PackageVersion = obj.PackageVersion;
+        gvas.EngineVersion = obj.EngineVersion;
+        gvas.CustomFormatVersion = obj.CustomFormatVersion;
+        gvas.CustomFormatData = obj.CustomFormatData;
+        gvas.SaveGameType = obj.SaveGameType;
         gvas.Properties = [];
-        json.Properties.forEach((prop) => gvas.Properties.push(PropertyFactory.create(prop)));
+        obj.Properties.forEach((prop) => gvas.Properties.push(PropertyFactory.create(prop)));
         return gvas;
     }
 }
