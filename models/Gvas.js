@@ -38,6 +38,22 @@ export class Gvas {
         size += 13; // 4 byte size + 5 byte string 'None\0' + 4 byte padding
         return size;
     }
+    deserialize(sav) {
+        let header = sav.read(4);
+        if(Buffer.compare(Buffer.from('GVAS'), header) !== 0)
+            throw Error(`Unexpected header, expected 'GVAS`)
+
+        this.SaveGameVersion = sav.readInt32();
+        this.PackageVersion = sav.readInt32();
+        this.EngineVersion = sav.readEngineVersion();
+        this.CustomFormatVersion = sav.readInt32();
+        this.CustomFormatData.Count = sav.readInt32();
+        for(let i = 0; i < this.CustomFormatData.Count; i++)
+            this.CustomFormatData.Entries.push(sav.readGuid());
+        this.SaveGameType = sav.readString();
+        this.Properties = sav.readProperties();
+        return this;
+    }
     serialize() {
         let buf = Buffer.alloc(this.Size);
         let offset = Buffer.from(this.Header).copy(buf, 0);
