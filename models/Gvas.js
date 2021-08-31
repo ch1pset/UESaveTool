@@ -53,7 +53,6 @@ export class Gvas {
         offset = buf.writeInt32LE(this.CustomFormatData.Count, offset);
         this.CustomFormatData.Entries.forEach(guid => {
             offset += guid.serialize().copy(buf, offset);
-            console.log(`Serialized GUID: ${guid.serialize().toString('hex')}`)
         });
         offset = buf.writeInt32LE(this.SaveGameType.length, offset);
         offset += buf.write(this.SaveGameType, offset);
