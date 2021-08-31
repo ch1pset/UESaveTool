@@ -16,14 +16,13 @@ export class GvasDesesrializer extends BufferReader {
         return EngineVersion;
     }
     readGuid() {
-        let guid = {}
-        guid.Id = `${this.read(4).swap32().toString('hex')}`
-        guid.Id += `-${this.read(2).swap16().toString('hex')}`
-        guid.Id += `-${this.read(2).swap16().toString('hex')}`
-        guid.Id += `-${this.read(2).toString('hex')}`
-        guid.Id += `-${this.read(6).toString('hex')}`
-        guid.Value = this.readInt32();
-        return new Guid(guid);
+        let Id = `${this.read(4).swap32().toString('hex')}`
+        Id += `-${this.read(2).swap16().toString('hex')}`
+        Id += `-${this.read(2).swap16().toString('hex')}`
+        Id += `-${this.read(2).toString('hex')}`
+        Id += `-${this.read(6).toString('hex')}`
+        let Value = this.readInt32();
+        return new Guid(Id, Value);
     }
     readProperties() {
         let data = [];

@@ -1,7 +1,6 @@
-import { Buffer } from 'buffer';
 import * as fs from 'fs';
 import { Gvas } from './models/index.js';
-import { Writer } from './utils/index.js';
+import { FileIO } from './utils/index.js';
 
 function UESerializer() 
 {
@@ -9,17 +8,15 @@ function UESerializer()
         if(err) throw err;
 
         const gvas = Gvas.from(JSON.parse(data));
-        // console.log(gvas);
-        const io = new Writer();
         try {
-            io.open('./output.sav', 'w');
-            io.write(gvas.serialize());
+            fs.writeFile('./output.sav', gvas.serialize(), (err) => {
+                if(err) throw err;
+            });
         }
         catch(e) {
             console.log(e);
         }
         finally {
-            io.close();
             console.log('Done.');
         }
     })

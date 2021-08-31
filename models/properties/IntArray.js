@@ -27,7 +27,7 @@ export class IntArray extends Property {
     }
     static from(obj) {
         let array = new IntArray([]);
-        Object.assign(array, obj);
+        obj.Properties.forEach(int => array.Properties.push(PropertyFactory.create(int)));
         return array;
     }
 }
