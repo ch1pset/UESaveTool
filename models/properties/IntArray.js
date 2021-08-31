@@ -21,7 +21,7 @@ export class IntArray extends Property {
         let buf = Buffer.alloc(this.Size);
         let offset = this.Properties.length > 1 ? 8 : 4;
         this.Properties.forEach(int => offset += int.serialize().copy(buf, offset));
-        if(buf.length !== this.Size)
+        if(offset !== this.Size)
             throw new SerializationError(this);
         return buf;
     }

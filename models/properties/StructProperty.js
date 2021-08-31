@@ -43,9 +43,7 @@ export class StructProperty extends Property {
         for(let i = 0; i < this.Property.length; i++) {
             offset += this.Property[i].serialize().copy(buf, offset);
         }
-        // offset = buf.writeInt32LE(5, offset);
-        // offset += buf.write('None\0', offset);
-        if(buf.length !== this.Size)
+        if(offset !== this.Size)
             throw new SerializationError(this);
         return buf;
     }

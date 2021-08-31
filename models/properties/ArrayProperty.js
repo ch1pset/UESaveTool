@@ -47,7 +47,7 @@ export class ArrayProperty extends Property {
         offset = buf.writeInt16LE(this.Property.Count, offset);
         offset += 2;
         offset += this.Property.serialize().copy(buf, offset);
-        if(buf.length !== this.Size)
+        if(offset !== this.Size)
             throw new SerializationError(this);
         return buf;
     }
