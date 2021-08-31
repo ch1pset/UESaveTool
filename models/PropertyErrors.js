@@ -6,6 +6,6 @@ export class SerializationError extends Error {
 
 export class TypeNotImplementedError extends Error {
     constructor(type) {
-        super(`Could not instantiate Property of type: '${type}'`);
+        super(`No implementation for Property type: '${type}'`);
     }
 }
