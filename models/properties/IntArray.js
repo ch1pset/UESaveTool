@@ -1,5 +1,6 @@
 import { Property } from './index.js'
 import { PropertyFactory } from '../factories/index.js'
+import { SerializationError } from '../index.js';
 
 export class IntArray extends Property {
     constructor(properties) {
@@ -7,17 +8,23 @@ export class IntArray extends Property {
         this.Properties = properties;
     }
     get Size() {
-        let size = 4;
+        let size = this.Properties.length > 1 ? 8 : 4;
         this.Properties.forEach((int) => {
             size += int.Size
         });
         return size;
     }
+    get Length() {
+        return this.Properties.length;
+    }
     serialize() {
-        let buf = [];
-        buf.push(Buffer.alloc(this.Properties.length > 1 ? 8 : 4));
-        this.Properties.forEach(int => buf.push(int.serialize()));
-        return Buffer.concat(buf);
+        let buf = Buffer.alloc(this.Size);
+        let offset = this.Properties.length > 1 ? 8 : 4;
+        this.Properties.forEach(int => offset += int.serialize().copy(buf, offset));
+        if(buf.length !== this.Size)
+            throw new SerializationError(this);
+        console.log(`Successfully serialized ${IntArray.name}`);
+        return buf;
     }
     static from(obj) {
         let array = new IntArray([]);

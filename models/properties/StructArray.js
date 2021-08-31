@@ -1,4 +1,5 @@
 import { Property, TupleProperty } from './index.js'
+import { SerializationError } from '../index.js';
 
 export class StructArray extends Property {
     constructor(name, type, prop, stype) {
@@ -6,24 +7,47 @@ export class StructArray extends Property {
         this.StoredPropertyType = stype;
     }
     get Size() {
-        let size = 0;
-        size += this.Name.length + 4;
+        let size = this.Name.length + 4;
         size += this.Type.length + 4;
-        size += 4;
+        size += 8; // 4 byte size + 4 byte padding
         size += this.StoredPropertyType.length + 4;
         size += 17;
         for(let i = 0; i < this.Property.length; i++) {
             size += this.Property[i].Size;
-            size += 9; // 4 bit padding + 5 bit string: 'None\0'
         }
         return size;
     }
+    get HeaderSize() {
+        let size = this.Name.length + 4;
+        size += this.Type.length + 4;
+        size += 8; // 4 byte size + 4 byte padding
+        size += this.StoredPropertyType.length + 4;
+        size += 17;
+        return size;
+    }
+    get Length() {
+        return this.Property.length;
+    }
     serialize() {
-        let buf = []
+        let buf = Buffer.alloc(this.Size);
+        let offset = 0;
+        offset = buf.writeInt32LE(this.Name.length, offset);
+        offset += buf.write(this.Name, offset);
+        offset = buf.writeInt32LE(this.Type.length, offset);
+        offset += buf.write(this.Type, offset);
+        offset = buf.writeInt32LE(this.Size - this.HeaderSize, offset);
+        offset += 4;
+        offset = buf.writeInt32LE(this.StoredPropertyType.length, offset);
+        offset += buf.write(this.StoredPropertyType, offset);
+        offset += 17;
         for(let i = 0; i < this.Property.length; i++) {
-            buf.push(this.Property[i].serialize());
+            offset += this.Property[i].serialize().copy(buf, offset);
         }
-        return Buffer.concat(buf);
+        console.log(`Expected size: ${this.Size} Actual Size: ${offset}`)
+        if(offset !== this.Size)
+            throw new SerializationError(this);
+        console.log(`Successfully serialized ${StructArray.name}`)
+        return buf;
     }
     static from(obj) {
         let struct = new StructArray();

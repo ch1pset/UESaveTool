@@ -1,4 +1,5 @@
 import { Property } from './index.js'
+import { SerializationError } from '../index.js';
 
 export class SoftObjectArray extends Property {
     constructor(properties) {
@@ -6,23 +7,26 @@ export class SoftObjectArray extends Property {
         this.Properties = properties;
     }
     get Size() {
-        let size = 4;
+        let size = 8;
         this.Properties.forEach((str) => {
             size += str.length + 4;
         });
         return size;
     }
+    get Length() {
+        return this.Properties.length;
+    }
     serialize() {
-        let buf = Buffer.alloc(this.size);
+        let buf = Buffer.alloc(this.Size);
         let offset = 0;
         this.Properties.forEach(str => {
             offset = buf.writeInt32LE(str.length, offset);
             offset += buf.write(str, offset);
             offset += 4;
         });
-        offset += 4;
         if(offset !== this.Size)
-            throw new Error(`Problem occured during serialization of Property: ${this}`);
+            throw new SerializationError(this);
+        console.log(`Successfully serialized ${SoftObjectArray.name}`);
         return buf;
     }
     static from(obj) {

@@ -17,8 +17,9 @@ export class FloatProperty extends Property {
         offset = buf.writeInt32LE(this.Type.length, offset);
         offset += buf.write(this.Type, offset);
         offset = buf.writeInt32LE(4, offset);
-        offset += 5
-        offset = buf.writeInt32LE(this.Property, offset);
+        offset = buf.writeInt32LE(this.Property[0], offset);
+        offset += 1
+        offset = buf.writeFloatLE(this.Property[1], offset);
         if(offset !== this.Size)
             throw new Error(`Problem occured during serialization of Property: ${this}`);
         return buf;

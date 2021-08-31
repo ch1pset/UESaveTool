@@ -15,6 +15,7 @@ import {
     StructArray
 } from '../models/properties/index.js'
 import { PropertyFactory } from '../models/factories/index.js'
+import { DeserializationError } from '../models/index.js';
 
 export class Reader extends FileIO {
     constructor() {
@@ -121,8 +122,10 @@ export class Reader extends FileIO {
                 return new IntProperty(name, type, prop);
 
             case 'FloatProperty\0':
-                this.seek(5);
-                prop = this.readFloat();
+                let int = this.readInt32();
+                this.seek(1);
+                let float = this.readFloat();
+                prop = [int, float];
                 return new FloatProperty(name, type, prop);
 
             case 'StrProperty\0':
@@ -149,8 +152,8 @@ export class Reader extends FileIO {
                 start = this.tell;
                 prop = this.readProperties();
                 let struct = new StructProperty(name, type, prop, stype)
-                // console.log(`Given Size: ${length} Struct Size: ${this.tell - start}`);
-                // console.log(`Calculated Struct Size: ${struct.Size - struct.HeaderSize}`);
+                console.log(`Given Size: ${length} Struct Size: ${this.tell - start}`);
+                console.log(`Calculated Struct Size: ${struct.Size - struct.HeaderSize}`);
                 // console.log(`Calculated Struct Size: ${struct.PropertiesSize}`)
                 console.log();
                 return struct;
@@ -166,7 +169,7 @@ export class Reader extends FileIO {
                 prop = this.readArray(atype, alength);
                 let arr = new ArrayProperty(name, type, prop, atype);
                 // console.log(`\t\tBytes Read: ${this.tell - start}`);
-                console.log(`\t\tCalculated Size: ${arr.Size - arr.HeaderSize}`);
+                console.log(`\tCalculated Size: ${arr.Size - arr.HeaderSize}`);
                 // console.log(`Calculated Array Size: ${arr.Size - arr.HeaderSize}\n`)
                 // console.log();
                 return arr;
@@ -179,7 +182,7 @@ export class Reader extends FileIO {
                 return new EnumProperty(name, type, prop, etype);
 
             default:
-                throw new Error(`Unrecognized Property '${type}' at offset 0x${(this.tell.toString(16))}`);
+                throw new DeserializationError(type, this.tell - type.length - 8);
         }
     }
 
@@ -200,19 +203,19 @@ export class Reader extends FileIO {
             case 'StructProperty\0':
                 let name = this.readString();
                 let type = this.readString();
-                this.readInt32(); // Struct Size
-                // console.log(`\t\tGiven Struct Array Size: ${this.readInt32()}`);
+                let size = this.readInt32(); // Struct Size
+                console.log(`\t\tGiven Struct Array Size: ${size}`);
                 this.seek(4);
                 let stype = this.readString();
                 this.seek(17);
-                // start = this.tell;
+                start = this.tell;
                 let prop = this.readStructArray(stype, alength);
-                // console.log(`\t\tBytes Read: ${this.tell - start}`);
+                console.log(`\t\tBytes Read: ${this.tell - start}`);
                 ret = new StructArray(name, type, prop, stype);
-                // console.log(`\t\tCalculated Struct Array Size: ${ret.Size - ret.HeaderSize - 4}`);
+                console.log(`\t\tCalculated Struct Array Size: ${ret.Size - ret.HeaderSize}`);
                 return ret;
             default:
-                throw new Error(`Unrecognized Property '${atype}' Reading Array at offset 0x${this.tell.toString(16)}`)
+                throw new DeserializationError(atype, this.tell - atype.length - 9);
         }
     }
     readIntArray(alength) {
