@@ -1,15 +1,6 @@
-import * as fs from 'fs';
-import { 
-    BoolProperty,
-    IntProperty,
-    FloatProperty,
-    StrProperty,
-    ObjectProperty,
-    SoftObjectProperty,
-    StructProperty,
-    ArrayProperty,
-    EnumProperty
-} from './index.js';
+import { PropertyFactory } from './factories/index.js';
+import { Guid } from './properties/index.js';
+import { SerializationError } from './PropertyErrors.js';
 
 export class Gvas {
     constructor()
@@ -32,50 +23,60 @@ export class Gvas {
         this.SaveGameType = "";
         this.Properties = [];
     }
-    static fromFile(path) {
-        let gvas = new Gvas();
-        let json = JSON.parse(fs.readFileSync(path, 'utf8'));
-        gvas.SaveGameVersion = json.SaveGameVersion;
-        gvas.PackageVersion = json.PackageVersion;
-        gvas.EngineVersion = json.EngineVersion;
-        gvas.CustomFormatVersion = json.CustomFormatVersion;
-        gvas.CustomFormatData = json.CustomFormatData;
-        gvas.SaveGameType = json.SaveGameType;
-        gvas.Properties = [];
-        json.Properties.forEach((prop) => {
-            switch(prop.Type)
-            {
-                case 'BoolProperty\0':
-                    gvas.Properties.push(BoolProperty.from(prop));
-                    break;
-                case 'IntProperty\0':
-                    gvas.Properties.push(IntProperty.from(prop));
-                    break;
-                case 'FloatProperty\0':
-                    gvas.Properties.push(FloatProperty.from(prop));
-                    break;
-                case 'StrProperty\0':
-                    gvas.Properties.push(StrProperty.from(prop));
-                    break;
-                case 'ObjectProperty\0':
-                    gvas.Properties.push(ObjectProperty.from(prop));
-                    break;
-                case 'SoftObjectProperty\0':
-                    gvas.Properties.push(SoftObjectProperty.from(prop));
-                    break;
-                case 'StructProperty\0':
-                    gvas.Properties.push(StructProperty.from(prop));
-                    break;
-                case 'ArrayProperty\0':
-                    gvas.Properties.push(ArrayProperty.from(prop));
-                    break;
-                case 'EnumProperty\0':
-                    gvas.Properties.push(EnumProperty.from(prop));
-                    break;
-                default:
-                    throw new Error(`Unrecognized Property '${prop.Type}' Generating Gvas`);
-            }
+    get Size() {
+        let size = this.Header.length;
+        size += 18;
+        size += this.EngineVersion.BuildId.length + 4;
+        size += 8;
+        this.CustomFormatData.Entries.forEach(guid => {
+            size += guid.Size; // 20
         })
+        size += this.SaveGameType.length + 4;
+        this.Properties.forEach(prop => {
+            size += prop.Size;
+        })
+        size += 13; // 4 byte size + 5 byte string 'None\0' + 4 byte padding
+        return size;
+    }
+    serialize() {
+        let buf = Buffer.alloc(this.Size);
+        let offset = Buffer.from(this.Header).copy(buf, 0);
+        offset = buf.writeInt32LE(this.SaveGameVersion, offset);
+        offset = buf.writeInt32LE(this.PackageVersion, offset);
+        offset = buf.writeInt16LE(this.EngineVersion.Major, offset);
+        offset = buf.writeInt16LE(this.EngineVersion.Minor, offset);
+        offset = buf.writeInt16LE(this.EngineVersion.Patch, offset);
+        offset = buf.writeInt32LE(this.EngineVersion.Build, offset);
+        offset = buf.writeInt32LE(this.EngineVersion.BuildId.length, offset);
+        offset += buf.write(this.EngineVersion.BuildId, offset);
+        offset = buf.writeInt32LE(this.CustomFormatVersion, offset);
+        offset = buf.writeInt32LE(this.CustomFormatData.Count, offset);
+        this.CustomFormatData.Entries.forEach(guid => {
+            offset += guid.serialize().copy(buf, offset);
+        });
+        offset = buf.writeInt32LE(this.SaveGameType.length, offset);
+        offset += buf.write(this.SaveGameType, offset);
+        this.Properties.forEach(prop => {
+            offset += prop.serialize().copy(buf, offset);
+        })
+        offset = buf.writeInt32LE(5, offset);
+        offset += buf.write('None\0', offset);
+        offset += 4;
+        if(offset !== this.Size)
+            throw new SerializationError(this);
+        return buf;
+    }
+    static from(obj) {
+        let gvas = new Gvas();
+        gvas.SaveGameVersion = obj.SaveGameVersion;
+        gvas.PackageVersion = obj.PackageVersion;
+        gvas.EngineVersion = obj.EngineVersion;
+        gvas.CustomFormatVersion = obj.CustomFormatVersion;
+        gvas.CustomFormatData.Count = obj.CustomFormatData.Count;
+        obj.CustomFormatData.Entries.forEach(guid => gvas.CustomFormatData.Entries.push(Guid.from(guid)))
+        gvas.SaveGameType = obj.SaveGameType;
+        gvas.Properties = [];
+        obj.Properties.forEach((prop) => gvas.Properties.push(PropertyFactory.create(prop)));
         return gvas;
     }
 }

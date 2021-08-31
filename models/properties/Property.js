@@ -9,7 +9,7 @@ export class Property {
         throw new Error(`Must implement getter for Size`);
     }
     serialize() {
-        throw new Error(`Serialization not implemented for property: ${JSON.stringify(this)}`);
+        throw new Error(`Serialization not implemented for property: ${this.Type}`);
     }
     static from(json) {
         throw new Error(`Must implement from function`);

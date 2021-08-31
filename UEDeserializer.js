@@ -2,6 +2,7 @@ import * as fs from 'fs';
 import { Buffer } from 'buffer';
 import { Gvas } from './models/index.js';
 import { Reader } from './utils/index.js';
+import { Guid } from './models/properties/index.js';
 
 function UEDeserializer()
 {
@@ -24,7 +25,7 @@ function UEDeserializer()
         gvas.CustomFormatData.Count = io.readInt32();
         for (let i = 0; i < gvas.CustomFormatData.Count; i++) {
             gvas.CustomFormatData.Entries
-                .push({ Id:io.readGuid(), Value:io.readInt32() });
+                .push(new Guid(io.readGuid(), io.readInt32()));
         }
         gvas.SaveGameType = io.readString();
         gvas.Properties = io.readProperties();
