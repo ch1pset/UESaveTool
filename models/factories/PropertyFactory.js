@@ -10,6 +10,7 @@ import {
     EnumProperty,
     TupleProperty
 } from '../properties/index.js'
+import { TypeNotImplementedError } from '../index.js';
 
 export class PropertyFactory {
     static create(obj) {
@@ -33,6 +34,8 @@ export class PropertyFactory {
                 return StructProperty.from(obj);
             case 'EnumProperty\0':
                 return EnumProperty.from(obj);
+            default:
+                throw new TypeNotImplementedError(obj.Type);
         }
     }
 }
