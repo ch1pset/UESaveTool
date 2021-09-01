@@ -11,13 +11,13 @@ Download this entire repo by clicking on the `Code` button above.
 ```
 node ./UEDeserializer.js [input: .sav path] [output: .json path]
 ```
-This generates a file: `output.json` in the script directory
+
 
 #### Serialization into GVAS/sav
 ```
 node ./UESerializer.js [input: .json path] [output: .sav path]
 ```
-This generates a file: `output.sav` in the script directory
+
 
 #### Using `Gvas` class for deserialization
 ```js
