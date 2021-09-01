@@ -2,11 +2,11 @@ import { Property } from './index.js'
 import { PropertyFactory } from '../factories/index.js';
 import { SerializationError } from '../index.js';
 
-export class TupleProperty extends Property {
-    constructor(props) {
+export class Tuple extends Property {
+    constructor() {
         super();
         this.Type = 'Tuple';
-        this.Properties = props;
+        this.Properties = [];
     }
     get Size() {
         let size = 0;
@@ -33,7 +33,8 @@ export class TupleProperty extends Property {
         return buf
     }
     static from(obj) {
-        let tuple = new TupleProperty([]);
+        let tuple = new Tuple();
+        tuple.Name = obj.Name;
         obj.Properties.forEach(prop => tuple.Properties.push(PropertyFactory.create(prop)));
         return tuple;
     }

@@ -1,9 +1,10 @@
 import { Property } from './index.js';
 
 export class EnumProperty extends Property {
-    constructor(name, type, prop, etype) {
-        super(name, type, prop);
-        this.EnumType = etype;
+    constructor() {
+        super();
+        this.EnumType = "";
+        this.Property = "";
     }
     get Size() {
         return this.Name.length + 4 

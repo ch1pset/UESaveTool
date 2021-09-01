@@ -8,7 +8,7 @@ import {
     StructProperty,
     ArrayProperty,
     EnumProperty,
-    TupleProperty,
+    Tuple,
     Guid
 } from '../properties/index.js'
 import { TypeNotImplementedError } from '../index.js';
@@ -38,7 +38,7 @@ export class PropertyFactory {
             case 'Guid':
                 return Guid.from(obj);
             case 'Tuple':
-                return TupleProperty.from(obj);
+                return Tuple.from(obj);
             default:
                 throw new TypeNotImplementedError(obj.Type);
         }

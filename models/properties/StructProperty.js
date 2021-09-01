@@ -2,9 +2,10 @@ import { Property } from './index.js'
 import { PropertyFactory } from '../factories/index.js';
 
 export class StructProperty extends Property {
-    constructor(name, type, prop, stype) {
-        super(name, type, prop);
-        this.StoredPropertyType = stype;
+    constructor() {
+        super();
+        this.StoredPropertyType = "";
+        this.Properties = [];
     }
     get Size() {
         let size = this.Name.length + 4;
@@ -12,8 +13,8 @@ export class StructProperty extends Property {
         size += 8; // 4 byte size + 4 byte padding
         size += this.StoredPropertyType.length + 4;
         size += 17; // 17 byte padding
-        for(let i = 0; i < this.Property.length; i++) {
-            size += this.Property[i].Size;
+        for(let i = 0; i < this.Properties.length; i++) {
+            size += this.Properties[i].Size;
         }
         return size;
     }
@@ -26,7 +27,7 @@ export class StructProperty extends Property {
         return size
     }
     get Count() {
-        return this.Property.length;
+        return this.Properties.length;
     }
     serialize() {
         let buf = Buffer.alloc(this.Size);
@@ -40,8 +41,8 @@ export class StructProperty extends Property {
         offset = buf.writeInt32LE(this.StoredPropertyType.length, offset);
         offset += buf.write(this.StoredPropertyType, offset);
         offset += 17;
-        for(let i = 0; i < this.Property.length; i++) {
-            offset += this.Property[i].serialize().copy(buf, offset);
+        for(let i = 0; i < this.Properties.length; i++) {
+            offset += this.Properties[i].serialize().copy(buf, offset);
         }
         if(offset !== this.Size)
             throw new SerializationError(this);
@@ -52,8 +53,8 @@ export class StructProperty extends Property {
         struct.Name = obj.Name;
         struct.Type = obj.Type;
         struct.StoredPropertyType = obj.StoredPropertyType;
-        struct.Property = [];
-        obj.Property.forEach((prop) => struct.Property.push(PropertyFactory.create(prop)));
+        struct.Properties = [];
+        obj.Properties.forEach((prop) => struct.Properties.push(PropertyFactory.create(prop)));
         return struct;
     }
 }

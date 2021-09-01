@@ -3,11 +3,11 @@ import { Property } from './index.js'
 import { SerializationError } from '../index.js';
 
 export class Guid extends Property {
-    constructor(id, guid) {
+    constructor() {
         super();
         this.Type = 'Guid';
-        this.Id = id;
-        this.Value = guid;
+        this.Id = "00000000-00-00-00-000000000000";
+        this.Value = 0;
     }
     get Size() {
         return 20;
@@ -28,6 +28,9 @@ export class Guid extends Property {
         return buf;
     }
     static from(obj) {
-        return new Guid(obj.Id, obj.Value);
+        let guid = new Guid();
+        guid.Id = obj.Id;
+        guid.Value = obj.Value;
+        return guid;
     }
 }

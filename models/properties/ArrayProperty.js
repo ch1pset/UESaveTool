@@ -4,9 +4,10 @@ import { ArrayFactory } from '../factories/index.js';
 import { SerializationError } from '../index.js'
 
 export class ArrayProperty extends Property {
-    constructor(name, type, prop, stype) {
-        super(name, type, prop);
-        this.StoredPropertyType = stype;
+    constructor() {
+        super();
+        this.StoredPropertyType = "";
+        this.Property = {};
     }
     get Size() {
         let size = 0; 

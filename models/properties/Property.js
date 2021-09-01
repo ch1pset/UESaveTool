@@ -1,9 +1,8 @@
 
 export class Property {
-    constructor(name, type, prop) {
-        this.Name = name;
-        this.Type = type;
-        this.Property = prop;
+    constructor() {
+        this.Name = "";
+        this.Type = "";
     }
     get Size() {
         throw new Error(`Must implement getter for Size`);

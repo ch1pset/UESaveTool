@@ -75,14 +75,15 @@ export class GvasDesesrializer extends BufferReader {
                 this.seek(4);
                 prop.StoredPropertyType = this.readString();
                 this.seek(17);
-                prop.Property = []
+                prop.Properties = []
                 let i = 0;
                 while(length ? i < length : i < 1) {
                     let props = {
+                        Name:prop.StoredPropertyType,
                         Type:'Tuple',
                         Properties:this.readProperties()
                     }
-                    prop.Property.push(PropertyFactory.create(props));
+                    prop.Properties.push(PropertyFactory.create(props));
                     i++;
                 }
                 break;

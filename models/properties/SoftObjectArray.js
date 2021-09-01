@@ -2,9 +2,10 @@ import { Property } from './index.js'
 import { SerializationError } from '../index.js';
 
 export class SoftObjectArray extends Property {
-    constructor(properties) {
+    constructor() {
         super();
-        this.Properties = properties;
+        this.Type = "SoftObjectArray";
+        this.Properties = [];
     }
     get Size() {
         let size = 8;
@@ -29,6 +30,8 @@ export class SoftObjectArray extends Property {
         return buf;
     }
     static from(obj) {
-        return new SoftObjectArray(obj.Properties);
+        let array = new SoftObjectArray();
+        array.Properties = obj.Properties;
+        return array;
     }
 }

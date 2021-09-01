@@ -3,9 +3,10 @@ import { PropertyFactory } from '../factories/index.js'
 import { SerializationError } from '../index.js';
 
 export class IntArray extends Property {
-    constructor(properties) {
+    constructor() {
         super();
-        this.Properties = properties;
+        this.Type = "IntArray"
+        this.Properties = [];
     }
     get Size() {
         let size = this.Properties.length > 1 ? 8 : 4;
@@ -26,7 +27,7 @@ export class IntArray extends Property {
         return buf;
     }
     static from(obj) {
-        let array = new IntArray([]);
+        let array = new IntArray();
         obj.Properties.forEach(int => array.Properties.push(PropertyFactory.create(int)));
         return array;
     }
