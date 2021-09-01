@@ -1,5 +1,5 @@
 import * as fs from 'fs';
-import { Gvas } from './models/index.js';
+import { Gvas } from './index.js';
 
 function UESerializer() 
 {
@@ -8,7 +8,7 @@ function UESerializer()
 
         const gvas = Gvas.from(JSON.parse(data));
         try {
-            fs.writeFile('./output.sav', gvas.serialize(), (err) => {
+            fs.writeFile(process.argv[3], gvas.serialize(), (err) => {
                 if(err) throw err;
             });
         }
