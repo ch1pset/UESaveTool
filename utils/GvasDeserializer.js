@@ -94,7 +94,7 @@ export class GvasDesesrializer extends BufferReader {
                 this.seek(1);
                 let count = this.readInt16();
                 this.seek(2);
-                prop.Property = this.readArray(prop.StoredPropertyType, count);
+                prop.Property = this.readArray(name, prop.StoredPropertyType, count);
                 break;
 
             case 'EnumProperty':
@@ -109,7 +109,7 @@ export class GvasDesesrializer extends BufferReader {
         }
         return PropertyFactory.create(prop);
     }
-    readArray(storedType, count) {
+    readArray(sName, storedType, count) {
         let array = {};
         switch(storedType.split('\0')[0]) {
             case 'IntProperty':
@@ -123,6 +123,7 @@ export class GvasDesesrializer extends BufferReader {
                 }
                 break;
             case 'SoftObjectProperty':
+                array.Name = sName;
                 array.Properties = []
                 for(let i = 0; i < count; i++) {
                     array.Properties.push(this.readString());
