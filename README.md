@@ -9,22 +9,22 @@ Download this entire repo by clicking on the `Code` button above.
 
 #### Deserialization into JSON
 ```
-node ./UEDeserializer.js [GSAV/.sav path]
+node ./UEDeserializer.js [input: .sav path] [output: .json path]
 ```
-This generates a file: `output.json` in the script directory
+
 
 #### Serialization into GVAS/sav
 ```
-node ./UESerializer.js [JSON path]
+node ./UESerializer.js [input: .json path] [output: .sav path]
 ```
-This generates a file: `output.sav` in the script directory
+
 
 #### Using `Gvas` class for deserialization
 ```js
 import * as fs from 'fs'
-import { Gvas } from './models/index.js'
+import { Gvas } from './index.js'
 
-fs.readFile(path, (err, buf) => {
+fs.readFile(sav-path, (err, buf) => {
     if(err) throw err;
 
     const gvas = new Gvas();
@@ -37,10 +37,10 @@ fs.readFile(path, (err, buf) => {
 #### Using `Gvas` class for serialization
 ```js
 import * as fs from 'fs';
-import { Gvas } from './models/index.js';
+import { Gvas } from './index.js';
 
-const gvas = Gvas.from(obj);
-fs.writeFile('./output.sav', gvas.serialize(), (err) => {
+const gvas = Gvas.from(json-path);
+fs.writeFile(sav-path, gvas.serialize(), (err) => {
     if(err) throw err;
 })
 ```
