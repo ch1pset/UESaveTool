@@ -2,12 +2,13 @@ import { PropertyFactory } from './factories/index.js';
 import { SerializationError } from './PropertyErrors.js';
 import { GvasDesesrializer } from '../utils/index.js';
 import { GvasHeader } from './index.js';
+import { Tuple } from './properties/index.js';
 
 export class Gvas {
     constructor()
     {
         this.Header = new GvasHeader();
-        this.Properties = [];
+        this.Properties = new Tuple();
     }
     get Size() {
         let size = this.Header.Size;
