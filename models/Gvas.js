@@ -11,10 +11,8 @@ export class Gvas {
     }
     get Size() {
         let size = this.Header.Size;
-        this.Properties.forEach(prop => {
-            size += prop.Size;
-        })
-        size += 13; // 4 byte size + 5 byte string 'None\0' + 4 byte padding
+        size += this.Properties.Size;
+        size += 4;
         return size;
     }
     deserialize(buf) {
@@ -31,18 +29,19 @@ export class Gvas {
         for(let i = 0; i < this.Header.CustomFormatData.Count; i++)
             this.Header.CustomFormatData.Entries.push(sav.readGuid());
         this.Header.SaveGameType = sav.readString();
-        this.Properties = sav.readProperties();
+        let props = {
+            Name: this.Header.SaveGameType,
+            Type:'Tuple',
+            Properties:sav.readProperties()
+        }
+        this.Properties = PropertyFactory.create(props);
         return this;
     }
     serialize() {
         let buf = Buffer.alloc(this.Size);
         let offset = 0;
         offset += this.Header.serialize().copy(buf, offset);
-        this.Properties.forEach(prop => {
-            offset += prop.serialize().copy(buf, offset);
-        })
-        offset = buf.writeInt32LE(5, offset);
-        offset += buf.write('None\0', offset);
+        offset += this.Properties.serialize().copy(buf, offset);
         offset += 4;
         if(offset !== this.Size)
             throw new SerializationError(this);
@@ -51,8 +50,7 @@ export class Gvas {
     static from(obj) {
         let gvas = new Gvas();
         gvas.Header = GvasHeader.from(obj.Header);
-        gvas.Properties = [];
-        obj.Properties.forEach((prop) => gvas.Properties.push(PropertyFactory.create(prop)));
+        gvas.Properties = PropertyFactory.create(obj.Properties);
         return gvas;
     }
 }
