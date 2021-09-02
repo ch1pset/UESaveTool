@@ -1,3 +1,8 @@
 {
+    "name": "uesavetool",
+    "author": {
+        "name": "ch1pset"
+    },
+    "version": "1.0",
     "type": "module"
 }
