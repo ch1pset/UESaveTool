@@ -1,6 +1,6 @@
 import { Buffer } from 'buffer'
 import { Property } from './index.js'
-import { ArrayFactory } from '../factories/index.js';
+import { PropertyFactory } from '../factories/index.js';
 import { SerializationError } from '../index.js'
 
 export class ArrayProperty extends Property {
@@ -57,7 +57,7 @@ export class ArrayProperty extends Property {
         array.Name = obj.Name;
         array.Type = obj.Type;
         array.StoredPropertyType = obj.StoredPropertyType;
-        array.Property = ArrayFactory.create(obj);
+        array.Property = PropertyFactory.create(obj.Property);
         return array;
     }
 }

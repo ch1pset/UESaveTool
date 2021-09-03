@@ -1,5 +1,7 @@
-import { PropertyFactory } from '../models/factories/index.js'
-import { DeserializationError, Gvas } from '../models/index.js';
+import { 
+    PropertyFactory,
+    DeserializationError
+} from '../models/index.js';
 import { BufferReader } from './BufferReader.js';
 
 export class GvasDesesrializer extends BufferReader {
@@ -113,6 +115,7 @@ export class GvasDesesrializer extends BufferReader {
         let array = {};
         switch(storedType.split('\0')[0]) {
             case 'IntProperty':
+                array.Type = 'IntArray';
                 array.Properties = []
                 this.seek((count > 1) ? 8 : 4);
                 for(let i = 0; i < count; i++) {
@@ -123,6 +126,7 @@ export class GvasDesesrializer extends BufferReader {
                 }
                 break;
             case 'SoftObjectProperty':
+                array.Type = 'SoftObjectArray'
                 array.Name = sName;
                 array.Properties = []
                 for(let i = 0; i < count; i++) {
