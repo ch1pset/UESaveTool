@@ -2,6 +2,7 @@ import { Buffer } from 'buffer'
 import { Property } from './index.js'
 import { PropertyFactory } from '../factories/index.js';
 import { SerializationError } from '../index.js'
+import { BufferReader } from '../../utils/index.js';
 
 export class ArrayProperty extends Property {
     constructor() {
@@ -32,6 +33,18 @@ export class ArrayProperty extends Property {
             return 12;
         else
             return this.Size - this.HeaderSize;
+    }
+    deserialize(buf, offset, prop) {
+        let start = offset;
+        let bfr = new BufferReader(buf);
+        this.Name = prop.Name;
+        this.Type = prop.Type;
+        bfr.seek(offset + 4);
+        this.StoredPropertyType = bfr.readString()
+        bfr.seek(1);
+        let count = bfr.readInt16();
+        bfr.seek(2);
+        //TODO: call deserialize() function for array type
     }
     serialize() {
         let buf = Buffer.alloc(this.Size);

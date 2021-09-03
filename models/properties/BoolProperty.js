@@ -1,4 +1,5 @@
 import { Property } from './index.js'
+import { BufferReader } from '../../utils/index.js';
 
 export class BoolProperty extends Property {
     constructor() {
@@ -9,6 +10,16 @@ export class BoolProperty extends Property {
         return this.Name.length + 4 
             + this.Type.length + 4 
             + 10;
+    }
+    deserialize(buf, offset, prop) {
+        let bfr = new BufferReader(buf);
+        let start = offset;
+        this.Name = prop.Name;
+        this.Type = prop.Type;
+        bfr.seek(start + 4);
+        this.Property = bfr.readUInt8() === 1;
+        bfr.seek(1);
+        return bfr.tell - start;
     }
     serialize() {
         let buf = Buffer.alloc(this.Size);

@@ -3,6 +3,7 @@ import {
     DeserializationError
 } from '../models/index.js';
 import { BufferReader } from './BufferReader.js';
+import { BoolProperty } from '../models/properties/index.js';
 
 export class GvasDesesrializer extends BufferReader {
     readEngineVersion() {
@@ -42,10 +43,13 @@ export class GvasDesesrializer extends BufferReader {
         prop.Type = type;
         switch(type.split('\0')[0]) {
             case 'BoolProperty':
-                this.seek(4);
-                prop.Property = this.readUInt8() === 1;
-                this.seek(1);
-                break;
+                let bTest = new BoolProperty();
+                this.seek(bTest.deserialize(this._data, this.tell, prop))
+                return bTest;
+                // this.seek(4);
+                // prop.Property = this.readUInt8() === 1;
+                // this.seek(1);
+                // break;
 
             case 'IntProperty':
                 let int1 = this.readInt32();
