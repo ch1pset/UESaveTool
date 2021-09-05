@@ -7,6 +7,8 @@ export class BufferStream {
     get Data() { return this._data }
     get tell() { return this._offset }
     seek(count) {
+        if(this._offset >= this._data.length)
+            throw new Error(`Reached end of Buffer at offset 0x${this.tell.toString('hex')}`);
         return this._offset += count;
     }
     read(count) {
@@ -37,7 +39,7 @@ export class BufferStream {
         return this.read(length).toString('utf8');
     }
     write(buf) {
-        this.seek(this.Data.write(buf, this.tell));
+        this._offset += this.Data.write(buf, this.tell);
     }
     writeInt32(num) {
         this._offset = this.Data.wirteInt32LE(num);
@@ -50,5 +52,13 @@ export class BufferStream {
     }
     writeFloat(num) {
         this._offset = this.Data.writeFloatLE(num);
+    }
+    writeString(str) {
+        this._offset = this.Data.writeInt32LE(str.length);
+        this._offset += this.Data.write(str, this.tell);
+    }
+    append(bfs) {
+        this._data = Buffer.concat([this.Data, bfs.Data]);
+        this._offset += bfs.Data.length;
     }
 }
