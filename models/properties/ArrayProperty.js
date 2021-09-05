@@ -2,7 +2,7 @@ import { Buffer } from 'buffer'
 import { Property } from './index.js'
 import { PropertyFactory } from '../factories/index.js';
 import { SerializationError } from '../index.js'
-import { BufferReader } from '../../utils/index.js';
+import { BufferStream } from '../../utils/index.js';
 
 export class ArrayProperty extends Property {
     constructor() {
@@ -11,7 +11,7 @@ export class ArrayProperty extends Property {
         this.Property = {};
     }
     get Size() {
-        let size = 0; 
+        let size = 0;
         size += this.Name.length + 4;
         size += this.Type.length + 4;
         size += 8; // 4 byte size + 4 byte padding
@@ -29,22 +29,34 @@ export class ArrayProperty extends Property {
         return size;
     }
     get ArraySize() {
-        if(this.StoredPropertyType === 'IntProperty\0')
+        if (this.StoredPropertyType === 'IntProperty\0')
             return 12;
         else
             return this.Size - this.HeaderSize;
     }
-    deserialize(buf, offset, prop) {
-        let start = offset;
-        let bfr = new BufferReader(buf);
-        this.Name = prop.Name;
-        this.Type = prop.Type;
-        bfr.seek(offset + 4);
-        this.StoredPropertyType = bfr.readString()
-        bfr.seek(1);
-        let count = bfr.readInt16();
-        bfr.seek(2);
-        //TODO: call deserialize() function for array type
+    deserialize(bfs, size) {
+        bfs.seek(4);
+        this.StoredPropertyType = bfs.readString()
+        bfs.seek(1);
+        let count = bfs.readInt16();
+        bfs.seek(2);
+
+        if (this.StoredPropertyType === 'StructProperty\0') {
+            this.Property = PropertyFactory.createArray({
+                Name: bfs.readString(),
+                Type: bfs.readString()
+            });
+            size[0] = bfs.readInt32();
+        }
+        else {
+            this.Property = PropertyFactory.createArray({
+                Name: this.Name,
+                Type: this.StoredPropertyType
+            });
+        }
+        this.Property.deserialize(bfs, [size, count])
+
+        return this;
     }
     serialize() {
         let buf = Buffer.alloc(this.Size);
@@ -61,7 +73,7 @@ export class ArrayProperty extends Property {
         offset = buf.writeInt16LE(this.Property.Count, offset);
         offset += 2;
         offset += this.Property.serialize().copy(buf, offset);
-        if(offset !== this.Size)
+        if (offset !== this.Size)
             throw new SerializationError(this);
         return buf;
     }
@@ -70,7 +82,8 @@ export class ArrayProperty extends Property {
         array.Name = obj.Name;
         array.Type = obj.Type;
         array.StoredPropertyType = obj.StoredPropertyType;
-        array.Property = PropertyFactory.create(obj.Property);
+        if (obj.Property !== undefined)
+            array.Property = PropertyFactory.create(obj.Property);
         return array;
     }
 }

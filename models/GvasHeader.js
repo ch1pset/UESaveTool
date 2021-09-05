@@ -7,16 +7,16 @@ export class GvasHeader {
         this.SaveGameVersion = 0;
         this.PackageVersion = 0;
         this.EngineVersion = {
-            Major:0,
-            Minor:0,
-            Patch:0,
-            Build:0, 
-            BuildId:""
+            Major: 0,
+            Minor: 0,
+            Patch: 0,
+            Build: 0,
+            BuildId: ""
         }
         this.CustomFormatVersion = 0;
         this.CustomFormatData = {
-            Count:0,
-            Entries:[]
+            Count: 0,
+            Entries: []
         }
         this.SaveGameType = "";
     }
@@ -30,6 +30,23 @@ export class GvasHeader {
         })
         size += this.SaveGameType.length + 4;
         return size;
+    }
+    deserialize(bfs) {
+        this.SaveGameVersion = bfs.readInt32();
+        this.PackageVersion = bfs.readInt32();
+        this.EngineVersion.Major = bfs.readInt16();
+        this.EngineVersion.Minor = bfs.readInt16();
+        this.EngineVersion.Patch = bfs.readInt16();
+        this.EngineVersion.Build = bfs.readInt32();
+        this.EngineVersion.BuildId = bfs.readString();
+        this.CustomFormatVersion = bfs.readInt32();
+        this.CustomFormatData.Count = bfs.readInt32();
+        for (let i = 0; i < this.CustomFormatData.Count; i++) {
+            let guid = PropertyFactory.create({ Type: 'Guid' })
+            this.CustomFormatData.Entries.push(guid.deserialize(bfs));
+        }
+        this.SaveGameType = bfs.readString();
+        return this;
     }
     serialize() {
         let buf = Buffer.alloc(this.Size);
@@ -49,7 +66,7 @@ export class GvasHeader {
         });
         offset = buf.writeInt32LE(this.SaveGameType.length, offset);
         offset += buf.write(this.SaveGameType, offset);
-        if(offset != this.Size)
+        if (offset != this.Size)
             throw SerializationError(this);
         return buf;
     }

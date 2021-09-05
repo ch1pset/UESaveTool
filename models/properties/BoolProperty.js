@@ -1,5 +1,5 @@
 import { Property } from './index.js'
-import { BufferReader } from '../../utils/index.js';
+import { BufferStream } from '../../utils/index.js';
 
 export class BoolProperty extends Property {
     constructor() {
@@ -7,19 +7,15 @@ export class BoolProperty extends Property {
         this.Property = false;
     }
     get Size() {
-        return this.Name.length + 4 
-            + this.Type.length + 4 
+        return this.Name.length + 4
+            + this.Type.length + 4
             + 10;
     }
-    deserialize(buf, offset, prop) {
-        let bfr = new BufferReader(buf);
-        let start = offset;
-        this.Name = prop.Name;
-        this.Type = prop.Type;
-        bfr.seek(start + 4);
-        this.Property = bfr.readUInt8() === 1;
-        bfr.seek(1);
-        return bfr.tell - start;
+    deserialize(bfs) {
+        bfs.seek(4);
+        this.Property = bfs.readUInt8() === 1;
+        bfs.seek(1);
+        return this;
     }
     serialize() {
         let buf = Buffer.alloc(this.Size);
@@ -31,7 +27,7 @@ export class BoolProperty extends Property {
         offset += 8
         offset = buf.writeUInt8(this.Property === true ? 1 : 0, offset);
         offset += 1;
-        if(offset !== this.Size)
+        if (offset !== this.Size)
             throw new Error(`Problem occured during serialization of Property: ${this}`);
         return buf;
     }

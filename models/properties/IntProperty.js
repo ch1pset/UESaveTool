@@ -3,12 +3,18 @@ import { Property } from './index.js'
 export class IntProperty extends Property {
     constructor() {
         super();
-        this.Property = 0;
+        this.Property = [];
     }
     get Size() {
-        return this.Name.length + 4 
+        return this.Name.length + 4
             + this.Type.length + 4
             + 13;
+    }
+    deserialize(bfs) {
+        this.Property[0] = bfs.readInt32();
+        bfs.seek(1);
+        this.Property[1] = bfs.readInt32();
+        return this;
     }
     serialize() {
         let buf = Buffer.alloc(this.Size);
@@ -21,7 +27,7 @@ export class IntProperty extends Property {
         offset = buf.writeInt32LE(this.Property[0], offset);
         offset += 1
         offset = buf.writeInt32LE(this.Property[1], offset);
-        if(offset !== this.Size)
+        if (offset !== this.Size)
             throw new Error(`Problem occured during serialization of Property: ${this}`);
         return buf;
     }

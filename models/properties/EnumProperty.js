@@ -7,11 +7,18 @@ export class EnumProperty extends Property {
         this.Property = "";
     }
     get Size() {
-        return this.Name.length + 4 
-            + this.Type.length + 4 
-            + this.Property.length + 4 
+        return this.Name.length + 4
+            + this.Type.length + 4
+            + this.Property.length + 4
             + this.EnumType.length + 4
             + 9;
+    }
+    deserialize(bfs) {
+        bfs.seek(4);
+        this.EnumType = bfs.readString();
+        bfs.seek(1);
+        this.Property = bfs.readString();
+        return this;
     }
     serialize() {
         let buf = Buffer.alloc(this.Size);
@@ -27,7 +34,7 @@ export class EnumProperty extends Property {
         offset += 1;
         offset = buf.writeInt32LE(this.Property.length, offset);
         offset += buf.write(this.Property, offset);
-        if(offset !== this.Size)
+        if (offset !== this.Size)
             throw new Error(`Problem occured during serialization of Property: ${this}`);
         return buf;
     }

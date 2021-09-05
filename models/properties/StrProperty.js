@@ -11,6 +11,11 @@ export class StrProperty extends Property {
             + this.Property.length + 4
             + 9;
     }
+    deserialize(bfs) {
+        bfs.seek(5);
+        this.Property = bfs.readString();
+        return this;
+    }
     serialize() {
         let buf = Buffer.alloc(this.Size);
         let offset = 0;
@@ -22,7 +27,7 @@ export class StrProperty extends Property {
         offset += 5;
         offset = buf.writeInt32LE(this.Property.length, offset);
         offset += buf.write(this.Property, offset);
-        if(offset !== this.Size)
+        if (offset !== this.Size)
             throw new Error(`Problem occured during serialization of Property: ${this}`);
         return buf;
     }

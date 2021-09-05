@@ -12,6 +12,15 @@ export class Guid extends Property {
     get Size() {
         return 20;
     }
+    deserialize(bfs) {
+        this.Id = `${bfs.read(4).swap32().toString('hex')}`
+        this.Id += `-${bfs.read(2).swap16().toString('hex')}`
+        this.Id += `-${bfs.read(2).swap16().toString('hex')}`
+        this.Id += `-${bfs.read(2).toString('hex')}`
+        this.Id += `-${bfs.read(6).toString('hex')}`
+        this.Value = bfs.readInt32();
+        return this;
+    }
     serialize() {
         let guid = this.Id.split('-');
         let buf = Buffer.alloc(this.Size);
@@ -22,8 +31,8 @@ export class Guid extends Property {
         offset += Buffer.from(guid[3], 'hex').copy(buf, offset);
         offset += Buffer.from(guid[4], 'hex').copy(buf, offset);
         offset = buf.writeInt32LE(this.Value, offset);
-        
-        if(offset !== 20)
+
+        if (offset !== 20)
             throw new SerializationError(this);
         return buf;
     }
