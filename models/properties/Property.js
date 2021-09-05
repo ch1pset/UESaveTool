@@ -13,11 +13,11 @@ export class Property {
     }
     /**
      * Per-property deserialization function
-     * @param {BufferStream} bfs BufferStream object used to read a buffer
+     * @param {Serializer} serial BufferStream object used to read a buffer
      * @param {Number} size Size in bytes or Count of elements for Arrays
      * @returns {Property} Returns `this` instance
      */
-    deserialize(bfs, size) {
+    deserialize(serial, size) {
         throw new Error(`Deserialization not implemented for property: ${this.Type}`);
     }
     /**

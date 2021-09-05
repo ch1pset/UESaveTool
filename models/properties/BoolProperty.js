@@ -11,25 +11,22 @@ export class BoolProperty extends Property {
             + this.Type.length + 4
             + 10;
     }
-    deserialize(bfs) {
-        bfs.seek(4);
-        this.Property = bfs.readUInt8() === 1;
-        bfs.seek(1);
+    deserialize(serial) {
+        serial.seek(4);
+        this.Property = serial.readUInt8() === 1;
+        serial.seek(1);
         return this;
     }
     serialize() {
-        let buf = Buffer.alloc(this.Size);
-        let offset = 0;
-        offset = buf.writeInt32LE(this.Name.length, offset);
-        offset += buf.write(this.Name, offset);
-        offset = buf.writeInt32LE(this.Type.length, offset);
-        offset += buf.write(this.Type, offset);
-        offset += 8
-        offset = buf.writeUInt8(this.Property === true ? 1 : 0, offset);
-        offset += 1;
-        if (offset !== this.Size)
+        let serial = Serializer.alloc(this.Size);
+        serial.writeString(this.Name);
+        serial.writeString(this.Type);
+        serial.seek(8);
+        serial.writeUInt8(this.Property === true ? 1 : 0);
+        serial.seek(1);
+        if (serial.tell !== this.Size)
             throw new Error(`Problem occured during serialization of Property: ${this}`);
-        return buf;
+        return serial.Data;
     }
     static from(obj) {
         let prop = new BoolProperty();

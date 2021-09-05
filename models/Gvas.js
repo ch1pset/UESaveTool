@@ -2,6 +2,7 @@ import { PropertyFactory } from './factories/index.js';
 import { SerializationError } from './PropertyErrors.js';
 import { GvasHeader } from './index.js';
 import { Tuple } from './properties/index.js';
+import { Serializer } from '../utils/Serializer.js';
 
 export class Gvas {
     constructor() {
@@ -14,25 +15,24 @@ export class Gvas {
         size += 4;
         return size;
     }
-    deserialize(bfs) {
-        let format = bfs.read(4);
+    deserialize(serial) {
+        let format = serial.read(4);
         if (Buffer.compare(Buffer.from('GVAS'), format) !== 0)
             throw Error(`Unexpected header, expected 'GVAS`)
 
-        this.Header.deserialize(bfs);
+        this.Header.deserialize(serial);
         this.Properties.Name = this.Header.SaveGameType;
-        this.Properties.deserialize(bfs);
+        this.Properties.deserialize(serial);
         return this;
     }
     serialize() {
-        let buf = Buffer.alloc(this.Size);
-        let offset = 0;
-        offset += this.Header.serialize().copy(buf, offset);
-        offset += this.Properties.serialize().copy(buf, offset);
-        offset += 4;
-        if (offset !== this.Size)
+        let serial = Serializer.alloc(this.Size);
+        serial.write(this.Header.serialize());
+        serial.write(this.Properties.serialize());
+        serial.seek(4);
+        if (serial.tell !== this.Size)
             throw new SerializationError(this);
-        return buf;
+        return serial.Data;
     }
     static from(obj) {
         let gvas = new Gvas();

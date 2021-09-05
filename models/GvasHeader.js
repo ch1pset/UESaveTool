@@ -1,5 +1,6 @@
 import { SerializationError } from './index.js';
 import { PropertyFactory } from './factories/index.js'
+import { Serializer } from '../utils/Serializer.js';
 
 export class GvasHeader {
     constructor() {
@@ -31,44 +32,42 @@ export class GvasHeader {
         size += this.SaveGameType.length + 4;
         return size;
     }
-    deserialize(bfs) {
-        this.SaveGameVersion = bfs.readInt32();
-        this.PackageVersion = bfs.readInt32();
-        this.EngineVersion.Major = bfs.readInt16();
-        this.EngineVersion.Minor = bfs.readInt16();
-        this.EngineVersion.Patch = bfs.readInt16();
-        this.EngineVersion.Build = bfs.readInt32();
-        this.EngineVersion.BuildId = bfs.readString();
-        this.CustomFormatVersion = bfs.readInt32();
-        this.CustomFormatData.Count = bfs.readInt32();
+    deserialize(serial) {
+        this.SaveGameVersion = serial.readInt32();
+        this.PackageVersion = serial.readInt32();
+        this.EngineVersion.Major = serial.readInt16();
+        this.EngineVersion.Minor = serial.readInt16();
+        this.EngineVersion.Patch = serial.readInt16();
+        this.EngineVersion.Build = serial.readInt32();
+        this.EngineVersion.BuildId = serial.readString();
+        this.CustomFormatVersion = serial.readInt32();
+        this.CustomFormatData.Count = serial.readInt32();
         for (let i = 0; i < this.CustomFormatData.Count; i++) {
             let guid = PropertyFactory.create({ Type: 'Guid' })
-            this.CustomFormatData.Entries.push(guid.deserialize(bfs));
+            this.CustomFormatData.Entries.push(guid.deserialize(serial));
         }
-        this.SaveGameType = bfs.readString();
+        this.SaveGameType = serial.readString();
         return this;
     }
     serialize() {
-        let buf = Buffer.alloc(this.Size);
-        let offset = Buffer.from(this.Format).copy(buf, 0);
-        offset = buf.writeInt32LE(this.SaveGameVersion, offset);
-        offset = buf.writeInt32LE(this.PackageVersion, offset);
-        offset = buf.writeInt16LE(this.EngineVersion.Major, offset);
-        offset = buf.writeInt16LE(this.EngineVersion.Minor, offset);
-        offset = buf.writeInt16LE(this.EngineVersion.Patch, offset);
-        offset = buf.writeInt32LE(this.EngineVersion.Build, offset);
-        offset = buf.writeInt32LE(this.EngineVersion.BuildId.length, offset);
-        offset += buf.write(this.EngineVersion.BuildId, offset);
-        offset = buf.writeInt32LE(this.CustomFormatVersion, offset);
-        offset = buf.writeInt32LE(this.CustomFormatData.Count, offset);
-        this.CustomFormatData.Entries.forEach(guid => {
-            offset += guid.serialize().copy(buf, offset);
-        });
-        offset = buf.writeInt32LE(this.SaveGameType.length, offset);
-        offset += buf.write(this.SaveGameType, offset);
-        if (offset != this.Size)
-            throw SerializationError(this);
-        return buf;
+        let serial = Serializer.alloc(this.Size);
+        serial.write(Buffer.from(this.Format));
+        serial.writeInt32(this.SaveGameVersion);
+        serial.writeInt32(this.PackageVersion);
+
+        serial.writeInt16(this.EngineVersion.Major);
+        serial.writeInt16(this.EngineVersion.Minor);
+        serial.writeInt16(this.EngineVersion.Patch);
+        serial.writeInt32(this.EngineVersion.Build);
+        serial.writeString(this.EngineVersion.BuildId);
+
+        serial.writeInt32(this.CustomFormatVersion);
+        serial.writeInt32(this.CustomFormatData.Count);
+        this.CustomFormatData.Entries.forEach(guid => serial.write(guid.serialize()));
+        serial.writeString(this.SaveGameType);
+        if (serial.tell != this.Size)
+            throw new SerializationError(this);
+        return serial.Data;
     }
     static from(obj) {
         let header = new GvasHeader();

@@ -1,6 +1,6 @@
 import * as fs from 'fs';
 import { Gvas } from './index.js';
-import { Serializer } from './utils/BufferStream.js';
+import { Serializer } from './utils/Serializer.js';
 
 function UEDeserializer() {
     fs.readFile(process.argv[2], (err, buf) => {

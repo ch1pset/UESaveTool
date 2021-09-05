@@ -1,4 +1,5 @@
 import { Property } from './index.js'
+import { Serializer } from '../../utils/Serializer.js';
 
 export class StrProperty extends Property {
     constructor() {
@@ -11,25 +12,21 @@ export class StrProperty extends Property {
             + this.Property.length + 4
             + 9;
     }
-    deserialize(bfs) {
-        bfs.seek(5);
-        this.Property = bfs.readString();
+    deserialize(serial) {
+        serial.seek(5);
+        this.Property = serial.readString();
         return this;
     }
     serialize() {
-        let buf = Buffer.alloc(this.Size);
-        let offset = 0;
-        offset = buf.writeInt32LE(this.Name.length, offset);
-        offset += buf.write(this.Name, offset);
-        offset = buf.writeInt32LE(this.Type.length, offset);
-        offset += buf.write(this.Type, offset);
-        offset = buf.writeInt32LE((this.Property.length + 4), offset);
-        offset += 5;
-        offset = buf.writeInt32LE(this.Property.length, offset);
-        offset += buf.write(this.Property, offset);
-        if (offset !== this.Size)
-            throw new Error(`Problem occured during serialization of Property: ${this}`);
-        return buf;
+        let serial = Serializer.alloc(this.Size);
+        serial.writeString(this.Name);
+        serial.writeString(this.Type);
+        serial.writeInt32(this.Property.length + 4);
+        serial.seek(5);
+        serial.writeString(this.Property);
+        if (serial.tell !== this.Size)
+            throw new SerializationError(this);
+        return serial.Data;
     }
     static from(obj) {
         let prop = new StrProperty();

@@ -1,5 +1,6 @@
 import { Property } from './index.js'
 import { PropertyFactory } from '../factories/index.js';
+import { Serializer } from '../../utils/Serializer.js';
 
 export class StructProperty extends Property {
     constructor() {
@@ -29,42 +30,38 @@ export class StructProperty extends Property {
     get Count() {
         return this.Properties.length;
     }
-    deserialize(bfs, size) {
+    deserialize(serial, size) {
         console.log(`Deserializing ${this.Name} Size: ${size}`)
-        bfs.seek(4);
-        this.StoredPropertyType = bfs.readString();
-        bfs.seek(17);
-        let end = bfs.tell + size;
+        serial.seek(4);
+        this.StoredPropertyType = serial.readString();
+        serial.seek(17);
+        let end = serial.tell + size;
         let i = 0;
-        while (bfs.tell < end) {
+        while (serial.tell < end) {
             let Name = this.StoredPropertyType;
             let Type = 'Tuple';
             let prop = PropertyFactory.create({ Name, Type })
-            prop.deserialize(bfs)
+            prop.deserialize(serial)
             this.Properties.push(prop);
             i++;
         }
-        console.log(`Done Deserializing ${this.Name} Offset: ${bfs.tell}`)
+        console.log(`Done Deserializing ${this.Name} Offset: ${serial.tell}`)
         return this;
     }
     serialize() {
-        let buf = Buffer.alloc(this.Size);
-        let offset = 0;
-        offset = buf.writeInt32LE(this.Name.length, offset);
-        offset += buf.write(this.Name, offset);
-        offset = buf.writeInt32LE(this.Type.length, offset);
-        offset += buf.write(this.Type, offset);
-        offset = buf.writeInt32LE(this.Size - this.HeaderSize, offset);
-        offset += 4;
-        offset = buf.writeInt32LE(this.StoredPropertyType.length, offset);
-        offset += buf.write(this.StoredPropertyType, offset);
-        offset += 17;
+        let serial = Serializer.alloc(this.Size);
+        serial.writeString(this.Name);
+        serial.writeString(this.Type);
+        serial.writeInt32(this.Size - this.HeaderSize);
+        serial.seek(4);
+        serial.writeString(this.StoredPropertyType);
+        serial.seek(17);
         for (let i = 0; i < this.Properties.length; i++) {
-            offset += this.Properties[i].serialize().copy(buf, offset);
+            serial.write(this.Properties[i].serialize());
         }
-        if (offset !== this.Size)
+        if (serial.tell !== this.Size)
             throw new SerializationError(this);
-        return buf;
+        return serial.Data;
     }
     static from(obj) {
         let struct = new StructProperty();

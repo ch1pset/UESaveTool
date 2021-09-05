@@ -1,6 +1,7 @@
 import { Property } from './index.js'
 import { PropertyFactory } from '../factories/index.js';
 import { SerializationError } from '../index.js';
+import { Serializer } from '../../utils/Serializer.js';
 
 export class Tuple extends Property {
     constructor() {
@@ -19,28 +20,26 @@ export class Tuple extends Property {
     get Count() {
         return this.Properties.length;
     }
-    deserialize(bfs) {
+    deserialize(serial) {
         let Name;
-        while ((Name = bfs.readString()) !== 'None\0') {
-            let Type = bfs.readString();
-            let Size = bfs.readInt32();
+        while ((Name = serial.readString()) !== 'None\0') {
+            let Type = serial.readString();
+            let Size = serial.readInt32();
             let prop = PropertyFactory.create({ Name, Type });
-            prop.deserialize(bfs, Size);
+            prop.deserialize(serial, Size);
             this.Properties.push(prop);
         }
         return this;
     }
     serialize() {
-        let buf = Buffer.alloc(this.Size);
-        let offset = 0;
+        let serial = Serializer.alloc(this.Size);
         for (let i = 0; i < this.Properties.length; i++) {
-            offset += this.Properties[i].serialize().copy(buf, offset)
+            serial.write(this.Properties[i].serialize());
         }
-        offset = buf.writeInt32LE(5, offset);
-        offset += buf.write('None\0', offset);
-        if (offset !== this.Size)
+        serial.writeString('None\0');
+        if (serial.tell !== this.Size)
             throw new SerializationError(this);
-        return buf
+        return serial.Data;
     }
     static from(obj) {
         let tuple = new Tuple();

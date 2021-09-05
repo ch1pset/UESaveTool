@@ -1,3 +1,4 @@
+import { Serializer } from '../../utils/Serializer.js';
 import { Property } from './index.js';
 
 export class EnumProperty extends Property {
@@ -13,30 +14,25 @@ export class EnumProperty extends Property {
             + this.EnumType.length + 4
             + 9;
     }
-    deserialize(bfs) {
-        bfs.seek(4);
-        this.EnumType = bfs.readString();
-        bfs.seek(1);
-        this.Property = bfs.readString();
+    deserialize(serial) {
+        serial.seek(4);
+        this.EnumType = serial.readString();
+        serial.seek(1);
+        this.Property = serial.readString();
         return this;
     }
     serialize() {
-        let buf = Buffer.alloc(this.Size);
-        let offset = 0;
-        offset = buf.writeInt32LE(this.Name.length, offset);
-        offset += buf.write(this.Name, offset);
-        offset = buf.writeInt32LE(this.Type.length, offset);
-        offset += buf.write(this.Type, offset);
-        offset = buf.writeInt32LE(this.Property.length + 4, offset);
-        offset += 4;
-        offset = buf.writeInt32LE(this.EnumType.length, offset);
-        offset += buf.write(this.EnumType, offset);
-        offset += 1;
-        offset = buf.writeInt32LE(this.Property.length, offset);
-        offset += buf.write(this.Property, offset);
-        if (offset !== this.Size)
+        let serial = Serializer.alloc(this.Size);
+        serial.writeString(this.Name);
+        serial.writeString(this.Type);
+        serial.writeInt32(this.Property.length + 4);
+        serial.seek(4);
+        serial.writeString(this.EnumType);
+        serial.seek(1);
+        serial.writeString(this.Property);
+        if (serial.tell !== this.Size)
             throw new Error(`Problem occured during serialization of Property: ${this}`);
-        return buf;
+        return serial.Data;
     }
     static from(obj) {
         let prop = new EnumProperty();
