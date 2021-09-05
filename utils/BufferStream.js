@@ -42,19 +42,19 @@ export class BufferStream {
         this._offset += buf.copy(this.Data, this.tell);
     }
     writeInt32(num) {
-        this._offset = this.Data.wirteInt32LE(num);
+        this._offset = this.Data.writeInt32LE(num, this.tell);
     }
     writeInt16(num) {
-        this._offset = this.Data.writeInt16LE(num);
+        this._offset = this.Data.writeInt16LE(num, this.tell);
     }
     writeUInt8(byte) {
-        this._offset = this.Data.writeUInt8(byte);
+        this._offset = this.Data.writeUInt8(byte, this.tell);
     }
     writeFloat(num) {
-        this._offset = this.Data.writeFloatLE(num);
+        this._offset = this.Data.writeFloatLE(num, this.tell);
     }
     writeString(str) {
-        this._offset = this.Data.writeInt32LE(str.length);
+        this._offset = this.Data.writeInt32LE(str.length, this.tell);
         this._offset += this.Data.write(str, this.tell);
     }
     append(buf) {
