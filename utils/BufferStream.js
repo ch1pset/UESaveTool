@@ -61,4 +61,7 @@ export class BufferStream {
         this._data = Buffer.concat([this.Data, buf]);
         this._offset += buf.length;
     }
+    static alloc(size) {
+        return new BufferStream(Buffer.alloc(size));
+    }
 }
