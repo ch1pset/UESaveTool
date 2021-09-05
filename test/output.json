@@ -398,7 +398,7 @@
                 "StoredPropertyType": "SoftObjectProperty\u0000",
                 "Property": {
                   "Name": "",
-                  "Type": "SoftObjectArray",
+                  "Type": "SoftObjectProperty",
                   "Properties": [
                     "/Game/Blueprints/Abilities/Curse/Curse_Mania.Curse_Mania_C\u0000",
                     "/Game/Blueprints/Abilities/Curse/Curse_Shopless.Curse_Shopless_C\u0000"
@@ -419,7 +419,7 @@
                 "StoredPropertyType": "IntProperty\u0000",
                 "Property": {
                   "Name": "",
-                  "Type": "IntArray",
+                  "Type": "IntProperty",
                   "Properties": [
                     {
                       "Name": "StoredCoins\u0000",
