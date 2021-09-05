@@ -39,7 +39,7 @@ export class BufferStream {
         return this.read(length).toString('utf8');
     }
     write(buf) {
-        this._offset += this.Data.write(buf, this.tell);
+        this._offset += buf.copy(this.Data, this.tell);
     }
     writeInt32(num) {
         this._offset = this.Data.wirteInt32LE(num);
@@ -57,8 +57,8 @@ export class BufferStream {
         this._offset = this.Data.writeInt32LE(str.length);
         this._offset += this.Data.write(str, this.tell);
     }
-    append(bfs) {
-        this._data = Buffer.concat([this.Data, bfs.Data]);
-        this._offset += bfs.Data.length;
+    append(buf) {
+        this._data = Buffer.concat([this.Data, buf]);
+        this._offset += buf.length;
     }
 }
