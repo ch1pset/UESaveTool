@@ -1,5 +1,5 @@
 
-export class BufferStream {
+export class Serializer {
     constructor(buf) {
         this._data = buf;
         this._offset = 0;
@@ -62,6 +62,6 @@ export class BufferStream {
         this._offset += buf.length;
     }
     static alloc(size) {
-        return new BufferStream(Buffer.alloc(size));
+        return new Serializer(Buffer.alloc(size));
     }
 }

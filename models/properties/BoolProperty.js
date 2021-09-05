@@ -1,5 +1,5 @@
 import { Property } from './index.js'
-import { BufferStream } from '../../utils/index.js';
+import { Serializer } from '../../utils/index.js';
 
 export class BoolProperty extends Property {
     constructor() {
