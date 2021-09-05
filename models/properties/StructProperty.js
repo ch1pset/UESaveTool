@@ -30,13 +30,13 @@ export class StructProperty extends Property {
         return this.Properties.length;
     }
     deserialize(bfs, size) {
-        console.log(`Deserializing ${this.Name} Size: ${size[0]} Count: ${size[1]}`)
+        console.log(`Deserializing ${this.Name} Size: ${size}`)
         bfs.seek(4);
         this.StoredPropertyType = bfs.readString();
         bfs.seek(17);
-        let end = bfs.tell + size[0];
+        let end = bfs.tell + size;
         let i = 0;
-        while (size[1] === undefined ? bfs.tell < end : i < size[1]) {
+        while (bfs.tell < end) {
             let Name = this.StoredPropertyType;
             let Type = 'Tuple';
             let prop = PropertyFactory.create({ Name, Type })

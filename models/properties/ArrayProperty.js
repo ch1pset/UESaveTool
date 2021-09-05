@@ -2,7 +2,6 @@ import { Buffer } from 'buffer'
 import { Property } from './index.js'
 import { PropertyFactory } from '../factories/index.js';
 import { SerializationError } from '../index.js'
-import { BufferStream } from '../../utils/index.js';
 
 export class ArrayProperty extends Property {
     constructor() {
@@ -40,21 +39,11 @@ export class ArrayProperty extends Property {
         bfs.seek(1);
         let count = bfs.readInt16();
         bfs.seek(2);
-
-        if (this.StoredPropertyType === 'StructProperty\0') {
-            this.Property = PropertyFactory.createArray({
-                Name: bfs.readString(),
-                Type: bfs.readString()
-            });
-            size[0] = bfs.readInt32();
-        }
-        else {
-            this.Property = PropertyFactory.createArray({
-                Name: this.Name,
-                Type: this.StoredPropertyType
-            });
-        }
-        this.Property.deserialize(bfs, [size, count])
+        this.Property = PropertyFactory.createArray({
+            Name: this.Name,
+            Type: this.StoredPropertyType
+        });
+        this.Property.deserialize(bfs, count)
 
         return this;
     }
@@ -83,7 +72,7 @@ export class ArrayProperty extends Property {
         array.Type = obj.Type;
         array.StoredPropertyType = obj.StoredPropertyType;
         if (obj.Property !== undefined)
-            array.Property = PropertyFactory.create(obj.Property);
+            array.Property = PropertyFactory.createArray(obj.Property);
         return array;
     }
 }

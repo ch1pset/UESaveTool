@@ -25,7 +25,7 @@ export class Tuple extends Property {
             let Type = bfs.readString();
             let Size = bfs.readInt32();
             let prop = PropertyFactory.create({ Name, Type });
-            prop.deserialize(bfs, [Size]);
+            prop.deserialize(bfs, Size);
             this.Properties.push(prop);
         }
         return this;

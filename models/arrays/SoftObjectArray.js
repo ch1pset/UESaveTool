@@ -1,10 +1,10 @@
-import { Property } from './index.js'
+import { Property } from '../properties/index.js'
 import { SerializationError } from '../index.js';
 
 export class SoftObjectArray extends Property {
     constructor() {
         super();
-        this.Type = "SoftObjectArray";
+        this.Type = "SoftObjectProperty";
         this.Properties = [];
     }
     get Size() {
@@ -17,8 +17,8 @@ export class SoftObjectArray extends Property {
     get Count() {
         return this.Properties.length;
     }
-    deserialize(bfs, size) {
-        for (let i = 0; i < size[1]; i++) {
+    deserialize(bfs, count) {
+        for (let i = 0; i < count; i++) {
             this.Properties.push(bfs.readString());
             bfs.seek(4);
         }

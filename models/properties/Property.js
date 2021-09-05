@@ -7,6 +7,9 @@ export class Property {
     get Size() {
         throw new Error(`Must implement getter for Size`);
     }
+    deserialize() {
+        throw new Error(`Deserialization not implemented for property: ${this.Type}`);
+    }
     serialize() {
         throw new Error(`Serialization not implemented for property: ${this.Type}`);
     }

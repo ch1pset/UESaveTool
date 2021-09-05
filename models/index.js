@@ -10,10 +10,14 @@ import {
     StrProperty,
     StructProperty,
     Tuple,
-    Guid,
-    IntArray,
-    SoftObjectArray
+    Guid
 } from './properties/index.js'
+
+import {
+    IntArray,
+    SoftObjectArray,
+    StructArray
+} from './arrays/index.js'
 
 PropertyFactory.add(ArrayProperty);
 PropertyFactory.add(BoolProperty);
@@ -28,7 +32,7 @@ PropertyFactory.add(Tuple);
 PropertyFactory.add(Guid);
 PropertyFactory.add(IntArray);
 PropertyFactory.add(SoftObjectArray);
-PropertyFactory.Arrays[StructProperty.name] = StructProperty;
+PropertyFactory.Arrays[StructProperty.name] = StructArray;
 PropertyFactory.Arrays[IntProperty.name] = IntArray;
 PropertyFactory.Arrays[SoftObjectProperty.name] = SoftObjectArray;
 // console.log(PropertyFactory.Properties);
