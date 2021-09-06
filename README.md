@@ -134,7 +134,7 @@ export { AnotherPropertyArray }
 #### Notes on `PropertyFactory.js`
 `PropertyFactory` will automatically trim null-terminating characters from strings. The name of the `Property` type will be in the .sav in utf8
 
-#### Anotomy of a `Property` in a GVAS
+## Anotomy of a `Property` in a GVAS
 Sizes are in Little-Endian, so the first byte read is the least significant. Strings are null-terminating. The following example is an `StrProperty` type.
 
 |                       | Bytes                                     | Value
@@ -153,7 +153,7 @@ Padding is different for most properties. Some properties contain a `StoredPrope
 ## Disclaimer
 **THIS SCRIPT WAS BUILT FOR THE BPM: BULLETS PER MINUTE COMMUNITY, BUT THIS MAY PROVE USEFUL FOR OTHER UE-BASED GAMES. IT IS NOT GUARANTEED TO WORK FOR ALL UE GAME SAVES.**
 
-### Verification Tools
+## Verification Tools
 ##### HxD Freeware Hex Editor
 https://mh-nexus.de/en/hxd/
 ##### Notepad++
