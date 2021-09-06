@@ -41,3 +41,5 @@ export { PropertyFactory }
 export { Gvas } from './Gvas.js'
 export { GvasHeader } from './GvasHeader.js'
 export * from './PropertyErrors.js'
+export * from './properties/index.js'
+export * from './arrays/index.js'
