@@ -56,6 +56,7 @@ If you want to expand functionality of this tool, you should follow the design p
 + `deserialize()` accepts a `Serializer` as an argument, and returns the `Gvas` instance
 + Properties' names must be exactly the same as in the .sav
 + `Array` properties are implementation dependent due to unique serialization
++ Size calcualated by `get Size()` is NOT written to the serialized data buffer. That value is usually, but not always, the total size of the property/properties within the current `Property`.
 
 #### Adding a new `Property` type
 `AnotherPropery.js`
@@ -73,7 +74,7 @@ export class AnotherProperty extends Property {
         // Use this.Property for it's value(s)
     }
     get Size() {
-        // Calculate number of bytes for serialization.
+        // Calculate number of bytes for serialization. Including this.Name and this.Type
         // Each string attribute will have a 4-byte size followed by that actual string
         let size = this.Name + 4;
         size += this.Type + 4;
@@ -85,6 +86,7 @@ export class AnotherProperty extends Property {
         // If `size` is passed, use `serial.tell < (start_offset + size)` as a loop condition
         // Do not deserialize this.Name, this.Type or the serialized Size here.
         // This function is called from the parent Property which already deserializes them
+        // The Size that is deserialized here is not the same as this.Size
         return this;
     }
     serialize() {
