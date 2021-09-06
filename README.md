@@ -22,13 +22,14 @@ node ./UESerializer.js [input: .json path] [output: .sav path]
 #### Using `Gvas` class for deserialization
 ```js
 import * as fs from 'fs'
-import { Gvas } from './index.js'
+import { Gvas, Serializer } from './index.js'
 
 fs.readFile(sav-path, (err, buf) => {
     if(err) throw err;
 
     const gvas = new Gvas();
-    gvas.deserialize(buf);
+    const serial = new Serializer(buf);
+    gvas.deserialize(serial);
     
     // manipulate gvas here
 })
@@ -47,12 +48,12 @@ fs.writeFile(sav-path, gvas.serialize(), (err) => {
 
 ## Implementation Notes
 If you want to expand functionality of this tool, you should follow the design patterns implemented within:
-+ All Properties extend from the `Property` class which has 3 functions: `get Size()`, `serialize()`, and `static from()`
-+ Properties are in charge of serializing themselves due to the unique formatting for each property
-+ Deserialization is handled by the `GvasDeserializer` class
++ All Properties extend from the `Property` class which has 4 functions: `get Size()`,`deserialize()`, `serialize()`, and `static from()`
++ Properties are in charge of serializing/deserializing themselves due to the unique formatting for each property
++ Use the `Serializer` class to read/write data on it's internal `Buffer`
 + Never instantiate a `Property` with `new`, instead, you should use the `PropertyFactory.create()` static function, which passes an object argument to the `from()` function implemented within the specified property type
 + For integration in other projects, you should use the `Gvas` class, which has 4 functions: `get Size()`, `deserialize()`, `serialize()`, and `static from()`
-+ `deserialize()` accepts a `Buffer` as an argument, and returns the `Gvas` instance populated by the `deserialize()` function
++ `deserialize()` accepts a `Serializer` as an argument, and returns the `Gvas` instance
 
 ## Disclaimer
 This script was built for the BPM: Bullets Per Minute community, but this may prove useful for other UE-based games. It is not guaranteed to work for all UE game saves.
