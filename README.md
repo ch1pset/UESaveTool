@@ -18,11 +18,17 @@ node ./UEDeserializer.js [input: .sav path] [output: .json path]
 node ./UESerializer.js [input: .json path] [output: .sav path]
 ```
 
+## Adding to your project
+
+First things first:
+```
+npm install uesavetool
+```
 
 #### Using `Gvas` class for deserialization
 ```js
 import * as fs from 'fs'
-import { Gvas, Serializer } from './index.js'
+import { Gvas, Serializer } from 'uesavetool'
 
 fs.readFile(sav-path, (err, buf) => {
     if(err) throw err;
@@ -38,7 +44,7 @@ fs.readFile(sav-path, (err, buf) => {
 #### Using `Gvas` class for serialization
 ```js
 import * as fs from 'fs';
-import { Gvas } from './index.js';
+import { Gvas } from 'uesavetool';
 
 const gvas = Gvas.from(json-path);
 fs.writeFile(sav-path, gvas.serialize(), (err) => {
@@ -65,7 +71,7 @@ import {
     Property,
     PropertyFactory,
     Serializer
-} from './index.js'
+} from 'uesavetool'
 
 export class AnotherProperty extends Property {
     constructor() {
@@ -115,6 +121,7 @@ export class AnotherProperty extends Property {
 ```
 `index.js`
 ```js
+import { PropertyFactory } from 'uesavetool'
 import { AnotherProperty } from './AnotherProperty.js'
 PropertyFactory.add(AnotherProperty);
 
@@ -126,6 +133,7 @@ Essentially the same as adding a new `Property` type, but since `ArrayProperty.S
 
 `index.js`
 ```js
+import { PropertyFactory } from 'uesavetool'
 import { AnotherProperty } from './AnotherProperty.js'
 import { AnotherPropertyArray } from './AnotherPropertyArray.js'
 PropertyFactory.Arrays[AnotherProperty.name] = AnotherPropertyArray
