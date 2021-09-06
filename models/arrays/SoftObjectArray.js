@@ -1,5 +1,6 @@
 import { Property } from '../properties/index.js'
 import { SerializationError } from '../index.js';
+import { Serializer } from '../../utils/Serializer.js';
 
 export class SoftObjectArray extends Property {
     constructor() {
@@ -17,24 +18,22 @@ export class SoftObjectArray extends Property {
     get Count() {
         return this.Properties.length;
     }
-    deserialize(bfs, count) {
+    deserialize(serial, count) {
         for (let i = 0; i < count; i++) {
-            this.Properties.push(bfs.readString());
-            bfs.seek(4);
+            this.Properties.push(serial.readString());
+            serial.seek(4);
         }
         return this;
     }
     serialize() {
-        let buf = Buffer.alloc(this.Size);
-        let offset = 0;
+        let serial = Serializer.alloc(this.Size);
         this.Properties.forEach(str => {
-            offset = buf.writeInt32LE(str.length, offset);
-            offset += buf.write(str, offset);
-            offset += 4;
+            serial.writeString(str);
+            serial.seek(4);
         });
-        if (offset !== this.Size)
+        if (serial.tell !== this.Size)
             throw new SerializationError(this);
-        return buf;
+        return serial.Data;
     }
     static from(obj) {
         let array = new SoftObjectArray();
