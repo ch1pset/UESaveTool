@@ -38,6 +38,10 @@ fs.readFile(sav-path, (err, buf) => {
     gvas.deserialize(serial);
     
     // manipulate gvas here
+
+    fs.writeFile(json-path, JSON.stringify(gvas), (err) => {
+        if(err) throw err;
+    })
 })
 ```
 
@@ -46,9 +50,16 @@ fs.readFile(sav-path, (err, buf) => {
 import * as fs from 'fs';
 import { Gvas } from 'uesavetool';
 
-const gvas = Gvas.from(json-path);
-fs.writeFile(sav-path, gvas.serialize(), (err) => {
+fs.readFile(json-path, 'utf8', (err, data) => {
     if(err) throw err;
+
+    const gvas = Gvas.from(JSON.parse(data));
+
+    // manipulate gvas here
+
+    fs.writeFile(sav-path, gvas.serialize(), (err) => {
+        if(err) throw err;
+    })
 })
 ```
 
