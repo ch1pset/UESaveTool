@@ -1,8 +1,32 @@
 {
-    "name": "uesavetool",
-    "author": {
-        "name": "ch1pset"
-    },
-    "version": "1.1.0",
-    "type": "module"
+  "name": "uesavetool",
+  "author": "ch1pset",
+  "main": "index.js",
+  "version": "1.1.0",
+  "type": "module",
+  "description": "A Node.js implementation for deserializing and converting GVAS/.sav files to JSON and vice-versa.",
+  "directories": {
+    "test": "test"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ch1pset/UESaveTool.git"
+  },
+  "keywords": [
+    "unreal",
+    "engine",
+    "gvas",
+    "save",
+    "tool",
+    "serializer"
+  ],
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/ch1pset/UESaveTool/issues"
+  },
+  "homepage": "https://github.com/ch1pset/UESaveTool#readme"
 }
