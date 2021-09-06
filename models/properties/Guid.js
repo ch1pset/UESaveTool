@@ -1,6 +1,7 @@
 import { Buffer } from 'buffer'
 import { Property } from './index.js'
 import { SerializationError } from '../index.js';
+import { Serializer } from '../../utils/Serializer.js';
 
 export class Guid extends Property {
     constructor() {
@@ -12,20 +13,27 @@ export class Guid extends Property {
     get Size() {
         return 20;
     }
+    deserialize(serial) {
+        this.Id = `${serial.read(4).swap32().toString('hex')}`
+        this.Id += `-${serial.read(2).swap16().toString('hex')}`
+        this.Id += `-${serial.read(2).swap16().toString('hex')}`
+        this.Id += `-${serial.read(2).toString('hex')}`
+        this.Id += `-${serial.read(6).toString('hex')}`
+        this.Value = serial.readInt32();
+        return this;
+    }
     serialize() {
         let guid = this.Id.split('-');
-        let buf = Buffer.alloc(this.Size);
-        let offset = 0
-        offset += Buffer.from(guid[0], 'hex').swap32().copy(buf, offset);
-        offset += Buffer.from(guid[1], 'hex').swap16().copy(buf, offset);
-        offset += Buffer.from(guid[2], 'hex').swap16().copy(buf, offset);
-        offset += Buffer.from(guid[3], 'hex').copy(buf, offset);
-        offset += Buffer.from(guid[4], 'hex').copy(buf, offset);
-        offset = buf.writeInt32LE(this.Value, offset);
-        
-        if(offset !== 20)
+        let serial = Serializer.alloc(this.Size);
+        serial.write(Buffer.from(guid[0], 'hex').swap32());
+        serial.write(Buffer.from(guid[1], 'hex').swap16());
+        serial.write(Buffer.from(guid[2], 'hex').swap16());
+        serial.write(Buffer.from(guid[3], 'hex'));
+        serial.write(Buffer.from(guid[4], 'hex'));
+        serial.writeInt32(this.Value);
+        if (serial.tell !== 20)
             throw new SerializationError(this);
-        return buf;
+        return serial.Data;
     }
     static from(obj) {
         let guid = new Guid();

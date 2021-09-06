@@ -1,5 +1,6 @@
 import { Property } from './index.js'
 import { PropertyFactory } from '../factories/index.js';
+import { Serializer } from '../../utils/Serializer.js';
 
 export class StructProperty extends Property {
     constructor() {
@@ -13,7 +14,7 @@ export class StructProperty extends Property {
         size += 8; // 4 byte size + 4 byte padding
         size += this.StoredPropertyType.length + 4;
         size += 17; // 17 byte padding
-        for(let i = 0; i < this.Properties.length; i++) {
+        for (let i = 0; i < this.Properties.length; i++) {
             size += this.Properties[i].Size;
         }
         return size;
@@ -29,24 +30,38 @@ export class StructProperty extends Property {
     get Count() {
         return this.Properties.length;
     }
-    serialize() {
-        let buf = Buffer.alloc(this.Size);
-        let offset = 0;
-        offset = buf.writeInt32LE(this.Name.length, offset);
-        offset += buf.write(this.Name, offset);
-        offset = buf.writeInt32LE(this.Type.length, offset);
-        offset += buf.write(this.Type, offset);
-        offset = buf.writeInt32LE(this.Size - this.HeaderSize, offset);
-        offset += 4;
-        offset = buf.writeInt32LE(this.StoredPropertyType.length, offset);
-        offset += buf.write(this.StoredPropertyType, offset);
-        offset += 17;
-        for(let i = 0; i < this.Properties.length; i++) {
-            offset += this.Properties[i].serialize().copy(buf, offset);
+    deserialize(serial, size) {
+        console.log(`Deserializing ${this.Name} Size: ${size}`)
+        serial.seek(4);
+        this.StoredPropertyType = serial.readString();
+        serial.seek(17);
+        let end = serial.tell + size;
+        let i = 0;
+        while (serial.tell < end) {
+            let Name = this.StoredPropertyType;
+            let Type = 'Tuple';
+            let prop = PropertyFactory.create({ Name, Type })
+            prop.deserialize(serial)
+            this.Properties.push(prop);
+            i++;
         }
-        if(offset !== this.Size)
+        console.log(`Done Deserializing ${this.Name} Offset: ${serial.tell}`)
+        return this;
+    }
+    serialize() {
+        let serial = Serializer.alloc(this.Size);
+        serial.writeString(this.Name);
+        serial.writeString(this.Type);
+        serial.writeInt32(this.Size - this.HeaderSize);
+        serial.seek(4);
+        serial.writeString(this.StoredPropertyType);
+        serial.seek(17);
+        for (let i = 0; i < this.Properties.length; i++) {
+            serial.write(this.Properties[i].serialize());
+        }
+        if (serial.tell !== this.Size)
             throw new SerializationError(this);
-        return buf;
+        return serial.Data;
     }
     static from(obj) {
         let struct = new StructProperty();
@@ -54,7 +69,8 @@ export class StructProperty extends Property {
         struct.Type = obj.Type;
         struct.StoredPropertyType = obj.StoredPropertyType;
         struct.Properties = [];
-        obj.Properties.forEach((prop) => struct.Properties.push(PropertyFactory.create(prop)));
+        if (obj.Properties !== undefined)
+            obj.Properties.forEach((prop) => struct.Properties.push(PropertyFactory.create(prop)));
         return struct;
     }
 }
