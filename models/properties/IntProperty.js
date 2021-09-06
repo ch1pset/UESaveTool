@@ -1,5 +1,6 @@
 import { Property } from './index.js'
 import { Serializer } from '../../utils/index.js';
+import { SerializationError } from '../PropertyErrors.js';
 
 export class IntProperty extends Property {
     constructor() {
@@ -26,7 +27,7 @@ export class IntProperty extends Property {
         serial.seek(1);
         serial.writeInt32(this.Property[1]);
         if (serial.tell !== this.Size)
-            throw new Error(`Problem occured during serialization of Property: ${this}`);
+            throw new SerializationError(this);
         return serial.Data;
     }
     static from(obj) {

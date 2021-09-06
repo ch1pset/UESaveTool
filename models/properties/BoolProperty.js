@@ -1,5 +1,6 @@
 import { Property } from './index.js'
 import { Serializer } from '../../utils/index.js';
+import { SerializationError } from '../PropertyErrors.js';
 
 export class BoolProperty extends Property {
     constructor() {
@@ -25,7 +26,7 @@ export class BoolProperty extends Property {
         serial.writeUInt8(this.Property === true ? 1 : 0);
         serial.seek(1);
         if (serial.tell !== this.Size)
-            throw new Error(`Problem occured during serialization of Property: ${this}`);
+            throw new SerializationError(this)
         return serial.Data;
     }
     static from(obj) {

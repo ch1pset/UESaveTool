@@ -8,7 +8,7 @@ export class Serializer {
     get tell() { return this._offset }
     seek(count) {
         if(this._offset >= this._data.length)
-            throw new Error(`Reached end of Buffer at offset 0x${this.tell.toString('hex')}`);
+            throw new Error(`Reached end of Buffer at offset 0x${this.tell.toString(16)}`);
         return this._offset += count;
     }
     read(count) {

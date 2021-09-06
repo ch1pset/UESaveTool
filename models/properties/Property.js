@@ -9,7 +9,7 @@ export class Property {
      * @returns {Number} `Size` in bytes of all attributes and properties held by this property to be serialized
      */
     get Size() {
-        throw new Error(`Must implement getter for Size`);
+        throw new Error(`Size getter not implemented for property: ${this.Type}`);
     }
     /**
      * Per-property deserialization function
@@ -32,6 +32,6 @@ export class Property {
      * @param {Object} json Template from which to create a new instance of a `Property`
      */
     static from(json) {
-        throw new Error(`Must implement from function`);
+        throw new Error(`from() not implemented for property: ${this.Type}`);
     }
 }

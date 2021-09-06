@@ -1,4 +1,5 @@
 import { Serializer } from '../../utils/Serializer.js';
+import { SerializationError } from '../PropertyErrors.js';
 import { Property } from './index.js';
 
 export class EnumProperty extends Property {
@@ -31,7 +32,7 @@ export class EnumProperty extends Property {
         serial.seek(1);
         serial.writeString(this.Property);
         if (serial.tell !== this.Size)
-            throw new Error(`Problem occured during serialization of Property: ${this}`);
+            throw new SerializationError(this);
         return serial.Data;
     }
     static from(obj) {
