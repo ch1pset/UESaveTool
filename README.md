@@ -1,7 +1,7 @@
 # UESaveTool
 A Node.js implementation for deserializing and converting GVAS/.sav files to JSON and vice-versa.
 
-[![npm version](https://badgen.net/npm/v/uesavetool)](https://www.npmjs.com/package/uesavetool) [![npm license](https://badgen.net/npm/license/uesavetool)](/license)
+[![npm version](https://badgen.net/npm/v/uesavetool)](https://www.npmjs.com/package/uesavetool) [![npm license](https://badgen.net/npm/license/uesavetool)](/LICENSE)
 
 ## Usage
 You must have [Node.js](www.nodejs.org) Version 16.7.0+ installed.  
