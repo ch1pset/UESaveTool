@@ -19,23 +19,23 @@ import {
     StructArray
 } from './arrays/index.js'
 
-PropertyFactory.add(ArrayProperty);
-PropertyFactory.add(BoolProperty);
-PropertyFactory.add(EnumProperty);
-PropertyFactory.add(FloatProperty);
-PropertyFactory.add(IntProperty);
-PropertyFactory.add(ObjectProperty);
-PropertyFactory.add(SoftObjectProperty);
-PropertyFactory.add(StrProperty);
-PropertyFactory.add(StructProperty);
-PropertyFactory.add(Tuple);
-PropertyFactory.add(Guid);
-PropertyFactory.add(IntArray);
-PropertyFactory.add(SoftObjectArray);
-PropertyFactory.Arrays[StructProperty.name] = StructArray;
-PropertyFactory.Arrays[IntProperty.name] = IntArray;
-PropertyFactory.Arrays[SoftObjectProperty.name] = SoftObjectArray;
-// console.log(PropertyFactory.Properties);
+PropertyFactory.Properties['ArrayProperty'] = ArrayProperty;
+PropertyFactory.Properties['BoolProperty'] = BoolProperty;
+PropertyFactory.Properties['EnumProperty'] = EnumProperty;
+PropertyFactory.Properties['FloatProperty'] = FloatProperty;
+PropertyFactory.Properties['IntProperty'] = IntProperty;
+PropertyFactory.Properties['ObjectProperty'] = ObjectProperty;
+PropertyFactory.Properties['SoftObjectProperty'] = SoftObjectProperty;
+PropertyFactory.Properties['StrProperty'] = StrProperty;
+PropertyFactory.Properties['StructProperty'] = StructProperty;
+PropertyFactory.Properties['Tuple'] = Tuple;
+PropertyFactory.Properties['Guid'] = Guid;
+PropertyFactory.Arrays['IntArray'] = IntArray;
+PropertyFactory.Arrays['SoftObjectArray'] = SoftObjectArray;
+PropertyFactory.Arrays['StructProperty'] = StructArray;
+PropertyFactory.Arrays['IntProperty'] = IntArray;
+PropertyFactory.Arrays['SoftObjectProperty'] = SoftObjectArray;
+// console.log(PropertyFactory);
 
 export { PropertyFactory }
 export { Gvas } from './Gvas.js'
