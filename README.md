@@ -141,7 +141,8 @@ export class AnotherProperty extends Property {
 ```js
 import { PropertyFactory } from 'uesavetool'
 import { AnotherProperty } from './AnotherProperty.js'
-PropertyFactory.add(AnotherProperty);
+
+PropertyFactory.Properties['AnotherProperty'] = AnotherProperty;
 
 export { AnotherProperty }
 ```
@@ -154,7 +155,9 @@ Essentially the same as adding a new `Property` type, but since `ArrayProperty.S
 import { PropertyFactory } from 'uesavetool'
 import { AnotherProperty } from './AnotherProperty.js'
 import { AnotherPropertyArray } from './AnotherPropertyArray.js'
-PropertyFactory.Arrays[AnotherProperty.name] = AnotherPropertyArray
+
+PropertyFactory.Properties['AnotherPropertyArray'] = AnotherPropertyArray //Needed if `Type` string ends with "Array" after being stored
+PropertyFactory.Arrays['AnotherProperty'] = AnotherPropertyArray //
 
 export { AnotherPropertyArray }
 ```
