@@ -5,18 +5,16 @@ A Node.js implementation for deserializing and converting GVAS/.sav files to JSO
 
 ## Usage
 You must have [Node.js](www.nodejs.org) Version 16.7.0+ installed.  
-Download this entire repo by clicking on the `Code` button above.
+Download/Clone this entire repo by clicking on the `Code` button above.
 
-
-#### Deserialization into JSON
+#### Convert Between .sav and .json
+```ps
+node ./usavetool.js [mode: -sav-to-json, -json-to-sav] [input path] [output path?]
 ```
-node ./UEDeserializer.js [input: .sav path] [output: .json path]
-```
 
-
-#### Serialization into GVAS/sav
+#### Pipe output to another script
 ```
-node ./UESerializer.js [input: .json path] [output: .sav path]
+node ./uesavetool.js [mode] [input] | my-script
 ```
 
 ## Adding to your project
