@@ -3,7 +3,7 @@ import { PropertyFactory } from "../index.js";
 
 export class StructArray extends StructProperty {
     deserialize(serial, count) {
-        console.log(`Deserializing ${this.Name} Count: ${count}`)
+        // console.log(`Deserializing ${this.Name} Count: ${count}`)
         this.Name = serial.readString()
         this.Type = serial.readString()
         let Size = serial.readInt32();
@@ -19,7 +19,7 @@ export class StructArray extends StructProperty {
             this.Properties.push(prop);
             i++;
         }
-        console.log(`Done Deserializing ${this.Name} Offset: ${serial.tell}`)
+        // console.log(`Done Deserializing ${this.Name} Offset: ${serial.tell}`)
         return this;
     }
     static from(obj) {

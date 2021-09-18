@@ -31,7 +31,7 @@ export class StructProperty extends Property {
         return this.Properties.length;
     }
     deserialize(serial, size) {
-        console.log(`Deserializing ${this.Name} Size: ${size}`)
+        // console.log(`Deserializing ${this.Name} Size: ${size}`)
         serial.seek(4);
         this.StoredPropertyType = serial.readString();
         serial.seek(17);
@@ -45,7 +45,7 @@ export class StructProperty extends Property {
             this.Properties.push(prop);
             i++;
         }
-        console.log(`Done Deserializing ${this.Name} Offset: ${serial.tell}`)
+        // console.log(`Done Deserializing ${this.Name} Offset: ${serial.tell}`)
         return this;
     }
     serialize() {
