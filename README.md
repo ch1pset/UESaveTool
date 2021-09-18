@@ -8,7 +8,7 @@ You must have [Node.js](www.nodejs.org) Version 16.7.0+ installed.
 Download/Clone this entire repo by clicking on the `Code` button above.
 
 #### Convert Between .sav and .json
-```ps
+```
 node ./usavetool.js [mode: -sav-to-json, -json-to-sav] [input path] [output path?]
 ```
 
