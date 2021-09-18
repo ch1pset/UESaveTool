@@ -5,9 +5,6 @@ class Factory {
         this.Properties = {}
         this.Arrays = {}
     }
-    add(ctor) {
-        this.Properties[ctor.name] = ctor;
-    }
     create(obj) {
         let type = obj.Type.split('\0')[0]
 

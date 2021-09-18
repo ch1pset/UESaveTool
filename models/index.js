@@ -35,7 +35,6 @@ PropertyFactory.Arrays['SoftObjectArray'] = SoftObjectArray;
 PropertyFactory.Arrays['StructProperty'] = StructArray;
 PropertyFactory.Arrays['IntProperty'] = IntArray;
 PropertyFactory.Arrays['SoftObjectProperty'] = SoftObjectArray;
-// console.log(PropertyFactory);
 
 export { PropertyFactory }
 export { Gvas } from './Gvas.js'
