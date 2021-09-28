@@ -9,9 +9,10 @@ export class SoftObjectArray extends Property {
         this.Properties = [];
     }
     get Size() {
-        let size = 8;
+        let size = 0;
         this.Properties.forEach((str) => {
             size += str.length + 4;
+            size += 4;
         });
         return size;
     }
