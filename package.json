@@ -2,7 +2,7 @@
   "name": "uesavetool",
   "author": "ch1pset",
   "main": "index.js",
-  "version": "1.1.6",
+  "version": "1.1.7",
   "type": "module",
   "description": "A Node.js implementation for deserializing and converting GVAS/.sav files to JSON and vice-versa.",
   "directories": {
