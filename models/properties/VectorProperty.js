@@ -23,6 +23,9 @@ export class VectorProperty extends Property {
     }
     static from(obj) {
         let vector = new VectorProperty();
-
+        vector.Name = obj.Name;
+        vector.Type = obj.Type;
+        obj.Property.forEach((f, i) => vector.Property[i] = f);
+        return vector;
     }
 }

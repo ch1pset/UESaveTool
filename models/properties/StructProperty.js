@@ -38,6 +38,7 @@ export class StructProperty extends Property {
         let end = serial.tell + size;
         if(this.StoredPropertyType === "Vector\0" || this.StoredPropertyType === "Rotator\0") {
             let prop = new VectorProperty();
+            prop.Type = this.StoredPropertyType;
             this.Properties.push(prop.deserialize(serial));
         }
         else {

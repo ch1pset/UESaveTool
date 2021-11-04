@@ -10,7 +10,8 @@ import {
     StrProperty,
     StructProperty,
     Tuple,
-    Guid
+    Guid,
+    VectorProperty
 } from './properties/index.js'
 
 import {
@@ -36,6 +37,8 @@ PropertyFactory.Arrays['StructProperty'] = StructArray;
 PropertyFactory.Arrays['IntProperty'] = IntArray;
 PropertyFactory.Arrays['SoftObjectProperty'] = SoftObjectArray;
 PropertyFactory.Properties['NameProperty'] = StrProperty;
+PropertyFactory.Properties['Vector'] = VectorProperty;
+PropertyFactory.Properties['Rotator'] = VectorProperty;
 
 export { PropertyFactory }
 export { Gvas } from './Gvas.js'
