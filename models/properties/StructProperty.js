@@ -1,4 +1,4 @@
-import { Property } from './index.js'
+import { Property, VectorProperty } from './index.js'
 import { PropertyFactory } from '../factories/index.js';
 import { Serializer } from '../../utils/Serializer.js';
 
@@ -36,14 +36,18 @@ export class StructProperty extends Property {
         this.StoredPropertyType = serial.readString();
         serial.seek(17);
         let end = serial.tell + size;
-        let i = 0;
-        while (serial.tell < end) {
-            let Name = this.StoredPropertyType;
-            let Type = 'Tuple';
-            let prop = PropertyFactory.create({ Name, Type })
-            prop.deserialize(serial)
-            this.Properties.push(prop);
-            i++;
+        if(this.StoredPropertyType === "Vector\0" || this.StoredPropertyType === "Rotator\0") {
+            let prop = new VectorProperty();
+            this.Properties.push(prop.deserialize(serial));
+        }
+        else {
+            while (serial.tell < end) {
+                let Name = this.StoredPropertyType;
+                let Type = 'Tuple';
+                let prop = PropertyFactory.create({ Name, Type })
+                prop.deserialize(serial)
+                this.Properties.push(prop);
+            }
         }
         // console.log(`Done Deserializing ${this.Name} Offset: ${serial.tell}`)
         return this;
