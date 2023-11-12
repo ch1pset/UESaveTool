@@ -9,7 +9,7 @@ Download/Clone this entire repo by clicking on the `Code` button above.
 
 #### Convert Between .sav and .json
 ```
-node ./usavetool.js [mode: -sav-to-json, -json-to-sav] [input path] [output path?]
+node ./uesavetool.js [mode: -sav-to-json, -json-to-sav] [input path] [output path?]
 ```
 
 #### Pipe output to another script
