@@ -8,6 +8,7 @@ import {
     ObjectProperty,
     SoftObjectProperty,
     StrProperty,
+    NameProperty,
     StructProperty,
     Tuple,
     Guid
@@ -27,6 +28,7 @@ PropertyFactory.Properties['IntProperty'] = IntProperty;
 PropertyFactory.Properties['ObjectProperty'] = ObjectProperty;
 PropertyFactory.Properties['SoftObjectProperty'] = SoftObjectProperty;
 PropertyFactory.Properties['StrProperty'] = StrProperty;
+PropertyFactory.Properties['NameProperty'] = NameProperty;
 PropertyFactory.Properties['StructProperty'] = StructProperty;
 PropertyFactory.Properties['Tuple'] = Tuple;
 PropertyFactory.Properties['Guid'] = Guid;
